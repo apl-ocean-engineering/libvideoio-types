@@ -8,22 +8,26 @@ using namespace std;
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-#include <zed/Camera.hpp>
+#ifdef USE_ZED
+	#include <zed/Camera.hpp>
+  #include "util/ZedUtils.h"
+#endif
 
 #include <tclap/CmdLine.h>
 
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
+
 #include "util/G3LogSinks.h"
-#include "util/ZedUtils.h"
+
 #include "util/DataSource.h"
 #include "util/Undistorter.h"
 
 #include "logger/LogWriter.h"
 
-#include "ZedRecorder/Display.h"
-#include "ZedRecorder/ImageOutput.h"
-#include "ZedRecorder/VideoOutput.h"
+#include "Display.h"
+#include "ImageOutput.h"
+#include "VideoOutput.h"
 
 using namespace lsd_slam;
 

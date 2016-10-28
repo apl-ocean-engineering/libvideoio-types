@@ -1,5 +1,6 @@
 
 include_directories(
+  ${VIDEOIO_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -8,7 +9,7 @@ include_directories(
 # )
 
 add_executable( Recorder Recorder.cpp)
-target_link_libraries(Recorder libvideoio )
+target_link_libraries( Recorder libvideoio )
 set_target_properties( Recorder PROPERTIES COMPILE_FLAGS "-ggdb")
 
 
