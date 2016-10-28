@@ -3,25 +3,17 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set( COMMON_LIBRARIES
-      camhd_motrack
-      ${G3LOG_LIB}
-      ${OpenCV_LIBRARIES}
-      ${Boost_LIBRARIES} )
+# set(CMAKE_CXX_FLAGS
+#    "${CMAKE_CXX_FLAGS} -ggdb"
+# )
 
-# build image node
-add_executable(motrack MotionTrack.cpp )
-target_link_libraries( motrack
-            ${COMMON_LIBRARIES} )
+add_executable( Recorder Recorder.cpp)
+target_link_libraries(Recorder libvideoio )
+set_target_properties( Recorder PROPERTIES COMPILE_FLAGS "-ggdb")
 
-# build image node
-add_executable(optical_flow OpticalFlow.cpp )
-target_link_libraries( optical_flow
-            ${COMMON_LIBRARIES} )
 
-if( USE_GPU )
-	add_executable(motrack_gpu MotionTrackGpu.cpp )
-	target_link_libraries( motrack_gpu
-    camhd_motrack
-            ${COMMON_LIBRARIES} )
-endif()
+# # build image node
+# add_executable(LSD LSD.cpp
+#   LSD/GuiThread.cpp
+#   LSD/InputThread.cpp)
+# target_link_libraries( LSD lsdslam )
