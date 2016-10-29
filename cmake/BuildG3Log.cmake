@@ -1,4 +1,5 @@
 
+
 SET( G3LOG_PREFIX_DIR ${PROJECT_BINARY_DIR}/g3log )
 SET( G3LOG_INSTALL_DIR ${G3LOG_PREFIX_DIR} )
 SET( G3LOG_SOURCE_DIR ${G3LOG_PREFIX_DIR}/src/g3log )
@@ -30,5 +31,7 @@ link_directories(
 )
 
 set( G3LOG_LIB g3logger )
+
+list( APPEND EXTERNAL_PROJECTS g3log )
 
 set_target_properties(g3log PROPERTIES EXCLUDE_FROM_ALL TRUE)

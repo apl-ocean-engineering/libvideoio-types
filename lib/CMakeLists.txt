@@ -19,4 +19,5 @@ target_link_libraries(libvideoio
   ${LIBLOGGER_LIBS}
   ${Boost_LIBRARIES}
   ${OpenCV_LIBS}
+  ${G3LOG_LIB}
 )

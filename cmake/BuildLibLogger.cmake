@@ -7,53 +7,59 @@ IF( DEFINED LOCAL_LIBLOGGER )
 
 	include( ${LOCAL_LIBLOGGER}/cmake/BuildLibActiveObject.cmake )
 
-	include_directories( ${LIBLOGGER_DIR}/include
-												${LIBACTIVE_OBJECT_INCLUDE_DIRS} )
-
+	include_directories( ${LIBLOGGER_DIR}/include )
 	add_subdirectory( ${LOCAL_LIBLOGGER}/lib liblogger )
+
+	SET( LIBLOGGER_INCLUDE_DIRS
+				${LIBLOGGER_INCLUDE_DIRS}
+				${LIBLOGGER_DIR}/include
+	 		)
+
 
 
 ELSE()
 
-	# SET( G3LOG_PREFIX_DIR ${PROJECT_BINARY_DIR}/g3log )
-	# SET( G3LOG_INSTALL_DIR ${G3LOG_PREFIX_DIR} )
+	message("Building LibLogger from Git.")
+	SET( LIBLOGGER_PREFIX_DIR ${PROJECT_BINARY_DIR}/liblogger )
+	SET( LIBLOGGER_INSTALL_DIR ${LIBLOGGER_PREFIX_DIR} )
 	# SET( G3LOG_SOURCE_DIR ${G3LOG_PREFIX_DIR}/src/g3log )
 	#
-	# SET( G3LOG_CMAKE_OPTS -DADD_FATAL_EXAMPLE:bool=OFF  )
-	# IF( DEFINED CMAKE_BUILD_TYPE )
-	# 	LIST(APPEND G3LOG_CMAKE_OPTS -DCMAKE_BUILD_TYPE:string=${CMAKE_BUILD_TYPE} )
-	# 	IF( ${CMAKE_BUILD_TYPE} STREQUAL Release )
-	# 		message( "Disabling the DEBUG level in G3LOG" )
-	# 		LIST(APPEND G3LOG_CMAKE_OPTS -DIGNORE_DEBUG_LEVEL:bool=ON )
-	# 	ENDIF()
-	# ENDIF()
-	#
-	# ## Uses my fork which doesn't create src/g3log/generated_definitions.hpp
-	# ## And thus doesn't need to be re-built every time...
-	# ExternalProject_Add( g3log
-	# 										GIT_REPOSITORY https://github.com/amarburg/g3log.git
-	# 										PREFIX g3log
-	# 										UPDATE_COMMAND git pull origin master
-	# 										BUILD_COMMAND ${EXTERNAL_PROJECT_MAKE_COMMAND}
-	# 										CMAKE_ARGS ${G3LOG_CMAKE_OPTS}
-	#   									INSTALL_COMMAND "" )
-	#
-	# ## g3log doesn't have an "install" target
-	# set( G3LOG_INCLUDE_DIR ${G3LOG_SOURCE_DIR}/src )
-	# set( G3LOG_LIB_DIR ${G3LOG_PREFIX_DIR}/src/g3log-build/ )
-	# link_directories(
-	#   ${G3LOG_LIB_DIR}
-	# )
-	#
-	# set( G3LOG_LIB g3logger )
-	#
-	# set_target_properties(g3log PROPERTIES EXCLUDE_FROM_ALL TRUE)
+ SET( LIBLOGGER_CMAKE_OPTS  )
+	IF( DEFINED CMAKE_BUILD_TYPE )
+		LIST(APPEND LIBLOGGER_CMAKE_OPTS -DCMAKE_BUILD_TYPE:string=${CMAKE_BUILD_TYPE} )
+	ENDIF()
+
+	LIST(APPEND LIBLOGGER_CMAKE_OPTS -DBUILD_UNIT_TESTS:bool=false)
+	LIST(APPEND LIBLOGGER_CMAKE_OPTS -DEXISTING_G3LOG:filepath=${PROJECT_BINARY_DIR}/g3log )
+
+
+	include_directories( ${G3LOG_INCLUDE_DIR} )
+
+	ExternalProject_Add( liblogger
+											GIT_REPOSITORY /Users/aaron/workspace/video_tools/liblogger #https://github.com/amarburg/liblogger
+											PREFIX liblogger
+											UPDATE_COMMAND git pull origin master
+											BUILD_COMMAND make deps all
+											CMAKE_ARGS ${LIBLOGGER_CMAKE_OPTS}
+	  									INSTALL_COMMAND ""
+											DEPENDS g3log )
+
+
+	set_target_properties(liblogger PROPERTIES EXCLUDE_FROM_ALL TRUE)
+	set( LIBLOGGER_INCLUDE_DIRS ${LIBLOGGER_INSTALL_DIR}/src/liblogger/include
+						${LIBLOGGER_INSTALL_DIR}/src/liblogger-build/libactive_object/src/libactive_object/include
+						${LIBLOGGER_INSTALL_DIR}/src/liblogger-build/google-snappy/include  )
+	set( LIBLOGGER_LIB_DIR ${LIBLOGGER_INSTALL_DIR}/src/liblogger-build/lib )
+
+	link_directories(
+	  ${LIBLOGGER_LIB_DIR}
+		${LIBLOGGER_INSTALL_DIR}/src/liblogger-build/libactive_object/src/libactive_object-build/lib
+		${LIBLOGGER_INSTALL_DIR}/src/liblogger-build/google-snappy/lib
+	)
+
+	list(APPEND EXTERNAL_PROJECTS liblogger )
+
 
 ENDIF()
 
-SET( LIBLOGGER_INCLUDE_DIRS
-			${LIBACTIVE_OBJECT_INCLUDE_DIRS}
-			${LIBLOGGER_DIR}/include
- 		)
-
-SET( LIBLOGGER_LIBS logger active_object)
+SET( LIBLOGGER_LIBS logger active_object snappy )

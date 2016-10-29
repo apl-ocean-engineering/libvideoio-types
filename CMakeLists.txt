@@ -13,8 +13,9 @@ find_package(TCLAP REQUIRED )
 find_package(ZLIB REQUIRED )
 find_package(Eigen3 REQUIRED )
 
+set( EXTERNAL_PROJECTS  )
 include( ${PROJECT_SOURCE_DIR}/cmake/BuildG3Log.cmake )
-set( EXTERNAL_PROJECTS g3log )
+
 
 
 ##==== Check and define the architecture (this is used in e.g. Zed.cmake )
@@ -101,7 +102,6 @@ option( BUILD_UNIT_TESTS "Build unit tests" ON )
 if( BUILD_UNIT_TESTS )
   ## Build a local copy of gtest (as per the GTest FAQ)
   include( ${CMAKE_SOURCE_DIR}/cmake/BuildGTestLibraries.cmake )
-	list( APPEND EXTERNAL_PROJECTS gtest )
 
   add_subdirectory( test/unit/ )
 
