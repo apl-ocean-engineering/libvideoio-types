@@ -53,7 +53,7 @@ message( ${LIBLOGGER_INCLUDE_DIRS})
 ## Set global include paths
 set( VIDEOIO_INCLUDE_DIRS
 	${G3LOG_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/lib
+  ${CMAKE_SOURCE_DIR}/include/libvideo_tools
   ${OpenCV_INCLUDE_DIRS}
 	${EIGEN3_INCLUDE_DIR}
  	${LIBLOGGER_INCLUDE_DIRS} )

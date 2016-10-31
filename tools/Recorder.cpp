@@ -13,10 +13,10 @@ namespace fs = boost::filesystem;
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
 
-#include "util/G3LogSinks.h"
+#include "G3LogSinks.h"
 
-#include "util/DataSource.h"
-#include "util/Undistorter.h"
+#include "DataSource.h"
+#include "Undistorter.h"
 
 #include "logger/LogWriter.h"
 
