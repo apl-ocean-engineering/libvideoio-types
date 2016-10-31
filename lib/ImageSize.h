@@ -1,13 +1,9 @@
+#pragma once
 
 #include <opencv2/core/core.hpp>
 
 #include <g3log/g3log.hpp>            // Provides CHECK() macros
 
-#ifdef USE_ZED
-#include <zed/Camera.hpp>
-#endif
-
-#pragma once
 
 namespace lsd_slam {
 
@@ -22,12 +18,6 @@ struct ImageSize {
     : width(sz.width), height(sz.height)
   {;}
 
-
-#ifdef USE_ZED
-  ImageSize( const sl::zed::resolution &res )
-    : width( res.width ), height( res.height )
-  {;}
-#endif
 
   long int area( void ) const { return width*height; }
   float aspectRatio( void ) const { return float(width)/float(height); }

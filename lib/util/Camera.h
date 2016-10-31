@@ -2,10 +2,6 @@
 
 #include <opencv2/core/core.hpp>
 
-#ifdef USE_ZED
-#include <zed/Camera.hpp>
-#endif
-
 #include "Eigen/Core"
 #include "Eigen/LU"
 
@@ -35,17 +31,6 @@ struct Camera {
   {
     buildK();
   }
-
-#ifdef USE_ZED
-  Camera( sl::zed::StereoParameters *params )
-    : fx( params->LeftCam.fx ),
-	    fy( params->LeftCam.fy ),
-	    cx( params->LeftCam.cx ),
-	    cy( params->LeftCam.cy )
-  {
-    buildK();
-  }
-#endif
 
   Camera scale( float scale ) const
   {
