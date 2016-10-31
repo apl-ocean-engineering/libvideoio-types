@@ -37,7 +37,7 @@ ELSE()
 	include_directories( ${G3LOG_INCLUDE_DIR} )
 
 	ExternalProject_Add( liblogger
-											GIT_REPOSITORY /Users/aaron/workspace/video_tools/liblogger #https://github.com/amarburg/liblogger
+											GIT_REPOSITORY https://github.com/amarburg/liblogger
 											PREFIX liblogger
 											UPDATE_COMMAND git pull origin master
 											BUILD_COMMAND make deps all
