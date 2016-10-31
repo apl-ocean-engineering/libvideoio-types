@@ -32,42 +32,26 @@ load 'config.rb' if FileTest::exists? 'config.rb'
 }
 
 namespace :dependencies do
-  task :linux do
-    sh "sudo apt-get install -y cmake opencv-dev"
+
+  task :trusty do
+    sh "sudo apt-get install -y cmake libopencv-dev libtclap-dev libboost-all-dev"
   end
 
   task :osx do
     sh "brew update"
     sh "brew tap homebrew/science"
-    sh "brew install cmake homebrew/science/opencv"
+    sh "brew install homebrew/science/opencv"
+  end
+
+  namespace :travis do
+
+    task :linux => "dependencies:trusty"
+
+    task :osx => [:pip_uninstall_numpy, "dependencies:osx"]
+
+    task :pip_uninstall_numpy do
+      sh "pip uninstall -y numpy"
+    end
+
   end
 end
-
-
-#
-# BUILD_DIR = "build"
-#
-#
-# task :default => :build
-#
-# task :build do
-#   unless FileTest::exists?( BUILD_DIR + "/g3log/src/g3log-build/libg3logger.a" )
-#     sh "cd %s && make deps" % BUILD_DIR
-#   end
-#
-#   sh "cd %s && make" % BUILD_DIR
-# end
-#
-# task :test do
-#   sh "cd %s && make unit_test" % BUILD_DIR
-# end
-#
-# task :bootstrap do
-# opencv_24_dir = "/opt/opencv-2.4/share/OpenCV"
-#
-#   FileUtils::mkdir BUILD_DIR unless FileTest::directory? BUILD_DIR
-#   sh "cd %s && OpenCV_DIR=#{opencv_24_dir} cmake -D CMAKE_BUILD_TYPE:STRING=\"Debug\" " \
-#       "-D LOCAL_LIBACTIVE_OBJECT:FILEPATH=../libactive_object " \
-#       "-D LOCAL_LIBLOGGER:FILEPATH=../liblogger " \
-#       ".." % BUILD_DIR
-# end
