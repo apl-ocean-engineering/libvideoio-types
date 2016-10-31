@@ -8,11 +8,6 @@ using namespace std;
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-#ifdef USE_ZED
-	#include <zed/Camera.hpp>
-  #include "util/ZedUtils.h"
-#endif
-
 #include <tclap/CmdLine.h>
 
 #include <g3log/g3log.hpp>
@@ -60,16 +55,14 @@ int main( int argc, char** argv )
 		TCLAP::ValueArg<float> fpsArg("f","fps","Input FPS, otherwise defaults to max FPS from input source",false,0.0,"", cmd);
 
 		TCLAP::ValueArg<std::string> logInputArg("","log-input","Input Logger file",false,"","", cmd);
-		TCLAP::ValueArg<std::string> svoInputArg("i","svo-input","Input SVO file",false,"","", cmd);
 
-		TCLAP::ValueArg<std::string> svoOutputArg("s","svo-output","Output SVO file",false,"","", cmd);
 		TCLAP::ValueArg<std::string> loggerOutputArg("l","log-output","Output Logger filename",false,"","", cmd);
 		TCLAP::ValueArg<std::string> calibOutputArg("","calib-output","Output calibration file (from stereolabs SDK)",false,"","Calib filename", cmd);
 
-		TCLAP::ValueArg<std::string> compressionArg("","compression","",false,"snappy","SVO filename", cmd);
+		TCLAP::ValueArg<std::string> compressionArg("","compression","Use Google Snappy compression",false,"snappy","", cmd);
 
-		TCLAP::ValueArg<std::string> imageOutputArg("","image-output","",false,"","SVO filename", cmd);
-		TCLAP::ValueArg<std::string> videoOutputArg("","video-output","",false,"","SVO filename", cmd);
+		TCLAP::ValueArg<std::string> imageOutputArg("","image-output","Save output to individual frames",false,"","dir", cmd);
+		TCLAP::ValueArg<std::string> videoOutputArg("","video-output","Save output to video",false,"","filename", cmd);
 
 		TCLAP::ValueArg<int> skipArg("","skip","",false,1,"", cmd);
 		TCLAP::ValueArg<int> startAtArg("","start-at","",false,0,"", cmd);
@@ -78,8 +71,6 @@ int main( int argc, char** argv )
 		TCLAP::ValueArg<std::string> statisticsOutputArg("","statistics-output","",false,"","", cmd);
 
 		// TCLAP::SwitchArg noGuiSwitch("","no-gui","Don't show a GUI", cmd, false);
-
-		TCLAP::SwitchArg disableSelfCalibSwitch("","disable-self-calib","", cmd, false);
 
 		TCLAP::SwitchArg depthSwitch("","depth","", cmd, false);
 		TCLAP::SwitchArg rightSwitch("","right","", cmd, false);
@@ -106,22 +97,13 @@ int main( int argc, char** argv )
 		}
 
 		// Output validation
-		if( !svoOutputArg.isSet() && !videoOutputArg.isSet() && !imageOutputArg.isSet() && !loggerOutputArg.isSet() && !guiSwitch.isSet() ) {
+		if( !videoOutputArg.isSet() && !imageOutputArg.isSet() && !loggerOutputArg.isSet() && !guiSwitch.isSet() ) {
 			LOG(WARNING) << "No output options set.";
 			exit(-1);
 		}
 
 		zed_recorder::Display display( guiSwitch.getValue() );
 		zed_recorder::ImageOutput imageOutput( imageOutputArg.getValue() );
-
-#ifdef USE_ZED
-		const sl::zed::ZEDResolution_mode zedResolution = parseResolution( resolutionArg.getValue() );
-		const sl::zed::MODE zedMode = (depthSwitch.getValue() ? sl::zed::MODE::QUALITY : sl::zed::MODE::NONE);
-		const int whichGpu = -1;
-		const bool verboseInit = true;
-		sl::zed::Camera *camera = NULL;
-#endif
-
 
 		DataSource *dataSource = NULL;
 
@@ -136,51 +118,6 @@ int main( int argc, char** argv )
 			if( calibOutputArg.isSet() )
 				LOG(WARNING) << "Can't create calibration file from a log file.";
 
-		} else {
-
-#ifdef USE_ZED
-			LOG_IF( FATAL, calibOutputArg.isSet() && svoInputArg.isSet() ) << "Calibration data isn't stored in SVO input files.";
-			LOG_IF( FATAL, calibOutputArg.isSet() && svoOutputArg.isSet() ) << "Calibration data is only generated when using live video, not when recording to SVO.";
-
-			if( svoInputArg.isSet() )	{
-				LOG(INFO) << "Loading SVO file " << svoInputArg.getValue();
-				camera = new sl::zed::Camera( svoInputArg.getValue() );
-			} else  {
-				LOG(INFO) << "Using live Zed data";
-				camera = new sl::zed::Camera( zedResolution, fpsArg.getValue() );
-			}
-
-			sl::zed::ERRCODE err = sl::zed::LAST_ERRCODE;
-			if( svoOutputArg.isSet() ) {
-				err = camera->initRecording( svoOutputArg.getValue() );
-			} else {
-#ifdef ZED_1_0
-				sl::zed::InitParams initParams;
-				initParams.mode = zedMode;
-				initParams.verbose = verboseInit;
-				iniParams.disableSelfCalib = disableSelfCalibSwitch.getValue();
-        err = camera->init( initParams );
-#else
-				// Disabling self-calibration
-				err = camera->init( zedMode, whichGpu, verboseInit, false, disableSelfCalibSwitch.getValue() );
- #endif
-			}
-
-			if (err != sl::zed::SUCCESS) {
-				LOG(WARNING) << "Unable to init the Zed camera (" << err << "): " << errcode2str(err);
-				delete camera;
-				exit(-1);
-			}
-
-			dataSource = new ZedSource( camera, depthSwitch.getValue() );
-
-			if( calibOutputArg.isSet() ) {
-					LOG(INFO) << "Saving calibration to \"" << calibOutputArg.getValue() << "\"";
-					lsd_slam::UndistorterLogger::calibrationFromZed( camera, calibOutputArg.getValue() );
-			}
-#else
-		LOG(WARNING) << "Compiled without Zed, can only use logger files.";
-#endif
 		}
 
 		int numFrames = dataSource->numFrames();
@@ -212,10 +149,6 @@ int main( int argc, char** argv )
 		const float sleepFudge = 1.0;
 		dt_us *= sleepFudge;
 
-#ifdef USE_ZED
-		LOG(INFO) << "Input is at " << resolutionToString( zedResolution ) << " at nominal " << fps << "FPS";
-#endif
-
 		std::chrono::steady_clock::time_point start( std::chrono::steady_clock::now() );
 		int duration = durationArg.getValue();
 		std::chrono::steady_clock::time_point end( start + std::chrono::seconds( duration ) );
@@ -237,26 +170,6 @@ int main( int argc, char** argv )
 
 			if( (duration > 0) && (loopStart > end) ) { keepGoing = false;  break; }
 
-			if( svoOutputArg.isSet() ) {
-
-			#ifdef USE_ZED
-
-				if( camera->record() ) {
-					LOG(WARNING) << "Error occured while recording from camera";
-				} else if( count % skip == 0 ) {
-					// According to the docs, this:
-					//		Get[s] the current side by side YUV 4:2:2 frame, CPU buffer.
-					sl::zed::Mat slRawImage( camera->getCurrentRawRecordedFrame() );
-					// Make a copy before enqueueing
-					Mat rawCopy;
-					sl::zed::slMat2cvMat( slRawImage ).reshape( 2, 0 ).copyTo( rawCopy );
-					display.showRawStereoYUV( rawCopy );
-				}
-
-			#endif
-
-
-			} else {
 
 				if( dataSource->grab() ) {
 
@@ -325,7 +238,7 @@ int main( int argc, char** argv )
 				} else {
 					LOG(WARNING) << "Problem grabbing from camera.";
 				}
-			}
+
 
 			if( count % skip == 0 )
 				display.waitKey();
@@ -347,17 +260,14 @@ int main( int argc, char** argv )
 
 
 		LOG(INFO) << "Cleaning up...";
-		if( camera && svoOutputArg.isSet() ) camera->stopRecording();
-
 		std::chrono::duration<float> dur( std::chrono::steady_clock::now()  - start );
 
 		LOG(INFO) << "Recorded " << count << " frames in " <<   dur.count();
 		LOG(INFO) << " Average of " << (float)count / dur.count() << " FPS";
 
 		std::string fileName;
-		if( svoOutputArg.isSet() ) {
-			fileName = svoOutputArg.getValue();
-		} else if( loggerOutputArg.isSet() ) {
+
+ 		if( loggerOutputArg.isSet() ) {
 			logWriter.close();
 			fileName = loggerOutputArg.getValue();
 		}
@@ -372,8 +282,8 @@ int main( int argc, char** argv )
 			if( statisticsOutputArg.isSet() ) {
 				ofstream out( statisticsOutputArg.getValue(), ios_base::out | ios_base::ate | ios_base::app );
 				if( out.is_open() ) {
-					out << resolutionToString( zedResolution ) << "," << fps << "," << (guiSwitch.isSet() ? "display" : "") << "," << count << "," << dur.count() << ","
-							<< fileSizeMB << endl;
+					//out << resolutionToString( zedResolution ) << "," << fps << "," << (guiSwitch.isSet() ? "display" : "") << "," << count << "," << dur.count() << ","
+					//		<< fileSizeMB << endl;
 				}
 			}
 		}
@@ -381,10 +291,6 @@ int main( int argc, char** argv )
 
 
 		if( dataSource ) delete dataSource;
-
-#ifdef USE_ZED
-		if( camera ) delete camera;
-#endif
 
 	} catch (TCLAP::ArgException &e)  // catch any exceptions
 	{
