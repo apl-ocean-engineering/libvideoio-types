@@ -15,7 +15,9 @@ namespace fs = boost::filesystem;
 #ifdef USE_ZED
 #include <zed/Camera.hpp>
 #endif
+
 #include "util/FileUtils.h"
+#include "ImageSize.h"
 
 #include "logger/LogReader.h"
 
@@ -29,6 +31,9 @@ public:
     : _fps( 0.0 )
   {;}
 
+  virtual ~DataSource()
+  {;}
+
   DataSource( const DataSource & ) = delete;
   DataSource &operator=( const DataSource & ) = delete;
 
@@ -36,6 +41,8 @@ public:
   int numImages( void ) const { return _numImages; }
 
   virtual int numFrames( void ) const = 0;
+
+  virtual ImageSize imageSize( void ) const = 0;
 
   virtual bool grab( void ) = 0;
 
@@ -96,6 +103,11 @@ public:
     return _idx;
   }
 
+  virtual ImageSize imageSize( void ) const
+  {
+    return ImageSize( 1, 1 );
+  }
+
 protected:
 
   std::vector<fs::path> _paths;
@@ -145,6 +157,11 @@ public:
     if( !_hasDepth ) return;
 
     mat = _reader.retrieve( _depthHandle );
+  }
+
+  virtual ImageSize imageSize( void ) const
+  {
+    return ImageSize( 0,0 );
   }
 
 protected:
@@ -211,7 +228,10 @@ public:
         LOG(WARNING) << "Asked for depth after begin configured not to compute depth";
   }
 
-
+  virtual ImageSize imageSize( void ) const
+  {
+    return ImageSize( _cam->getImageSize() );
+  }
 
 protected:
 

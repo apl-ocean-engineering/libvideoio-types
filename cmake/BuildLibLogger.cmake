@@ -1,11 +1,12 @@
 
 
 IF( DEFINED LOCAL_LIBLOGGER )
-	message( "Building local copy of LibLogger")
+	message( "Using local copy of LibLogger")
 
 	set( LIBLOGGER_DIR ${LOCAL_LIBLOGGER} )
 
 	include( ${LOCAL_LIBLOGGER}/cmake/BuildLibActiveObject.cmake )
+	include( ${LOCAL_LIBLOGGER}/cmake/BuildGoogleSnappy.cmake )
 
 	include_directories( ${LIBLOGGER_DIR}/include )
 	add_subdirectory( ${LOCAL_LIBLOGGER}/lib liblogger )
@@ -62,4 +63,4 @@ ELSE()
 
 ENDIF()
 
-SET( LIBLOGGER_LIBS logger active_object snappy )
+SET( LIBLOGGER_LIBS logger active_object ${SNAPPY_LIBRARIES} )

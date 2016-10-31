@@ -31,10 +31,6 @@ namespace fs = boost::filesystem;
 
 using namespace lsd_slam;
 
-#ifndef USE_ZED
-	#error "ZedRecorder shouldn't be built unless USE_ZED is defined."
-#endif
-
 bool keepGoing = true;
 
 void signal_handler( int sig )
@@ -118,15 +114,17 @@ int main( int argc, char** argv )
 		zed_recorder::Display display( guiSwitch.getValue() );
 		zed_recorder::ImageOutput imageOutput( imageOutputArg.getValue() );
 
-
+#ifdef USE_ZED
 		const sl::zed::ZEDResolution_mode zedResolution = parseResolution( resolutionArg.getValue() );
 		const sl::zed::MODE zedMode = (depthSwitch.getValue() ? sl::zed::MODE::QUALITY : sl::zed::MODE::NONE);
 		const int whichGpu = -1;
 		const bool verboseInit = true;
+		sl::zed::Camera *camera = NULL;
+#endif
+
 
 		DataSource *dataSource = NULL;
 
-		sl::zed::Camera *camera = NULL;
 
 		if( logInputArg.isSet() ) {
 			LOG(INFO) << "Loading logger data from " << logInputArg.getValue();
@@ -140,6 +138,7 @@ int main( int argc, char** argv )
 
 		} else {
 
+#ifdef USE_ZED
 			LOG_IF( FATAL, calibOutputArg.isSet() && svoInputArg.isSet() ) << "Calibration data isn't stored in SVO input files.";
 			LOG_IF( FATAL, calibOutputArg.isSet() && svoOutputArg.isSet() ) << "Calibration data is only generated when using live video, not when recording to SVO.";
 
@@ -179,6 +178,9 @@ int main( int argc, char** argv )
 					LOG(INFO) << "Saving calibration to \"" << calibOutputArg.getValue() << "\"";
 					lsd_slam::UndistorterLogger::calibrationFromZed( camera, calibOutputArg.getValue() );
 			}
+#else
+		LOG(WARNING) << "Compiled without Zed, can only use logger files.";
+#endif
 		}
 
 		int numFrames = dataSource->numFrames();
@@ -189,8 +191,7 @@ int main( int argc, char** argv )
 		logger::LogWriter logWriter( compressLevel );
 		logger::FieldHandle_t leftHandle = 0, rightHandle = 1, depthHandle = 2;
 		if( loggerOutputArg.isSet() ) {
-			sl::zed::resolution res( camera->getImageSize() );
-			cv::Size sz( res.width, res.height);
+			cv::Size sz(  dataSource->imageSize().cvSize() );
 
 			leftHandle = logWriter.registerField( "left", sz, logger::FIELD_BGRA_8C );
 			if( depthSwitch.getValue() ) depthHandle = logWriter.registerField( "depth", sz, logger::FIELD_DEPTH_32F );
@@ -211,16 +212,19 @@ int main( int argc, char** argv )
 		const float sleepFudge = 1.0;
 		dt_us *= sleepFudge;
 
+#ifdef USE_ZED
 		LOG(INFO) << "Input is at " << resolutionToString( zedResolution ) << " at nominal " << fps << "FPS";
+#endif
 
 		std::chrono::steady_clock::time_point start( std::chrono::steady_clock::now() );
 		int duration = durationArg.getValue();
 		std::chrono::steady_clock::time_point end( start + std::chrono::seconds( duration ) );
 
-		if( duration > 0 )
+		if( duration > 0 ){
 			LOG(INFO) << "Will log for " << duration << " seconds or press CTRL-C to stop.";
-		else
+		} else {
 			LOG(INFO) << "Logging now, press CTRL-C to stop.";
+		}
 
 		// Wait for the auto exposure and white balance
 		std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -235,6 +239,8 @@ int main( int argc, char** argv )
 
 			if( svoOutputArg.isSet() ) {
 
+			#ifdef USE_ZED
+
 				if( camera->record() ) {
 					LOG(WARNING) << "Error occured while recording from camera";
 				} else if( count % skip == 0 ) {
@@ -246,6 +252,8 @@ int main( int argc, char** argv )
 					sl::zed::slMat2cvMat( slRawImage ).reshape( 2, 0 ).copyTo( rawCopy );
 					display.showRawStereoYUV( rawCopy );
 				}
+
+			#endif
 
 
 			} else {
@@ -373,7 +381,10 @@ int main( int argc, char** argv )
 
 
 		if( dataSource ) delete dataSource;
+
+#ifdef USE_ZED
 		if( camera ) delete camera;
+#endif
 
 	} catch (TCLAP::ArgException &e)  // catch any exceptions
 	{
