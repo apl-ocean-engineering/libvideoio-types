@@ -9,9 +9,11 @@ add_executable( videoio_test
 link_directories( ${GTEST_LIBRARY_DIR} )
 
 target_link_libraries( videoio_test
-          ${GTEST_BOTH_LIBRARIES}
-          libvideoio )
+          ${CONAN_LIBS}
+          videoio )
 
 # Don't use ctest, instead just execture the Google test binaries
-add_custom_target( unit_test ${PROJECT_BINARY_DIR}/videoio_test
+add_custom_target( unit_test
+                    COMMAND ./videoio_test
+                    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bin
                     DEPENDS videoio_test )
