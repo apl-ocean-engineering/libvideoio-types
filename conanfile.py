@@ -1,15 +1,13 @@
 from conans import ConanFile, CMake
 
-class LibActiveObjectConan(ConanFile):
-  name = "liblogger"
+class LibVideiIOConan(ConanFile):
+  name = "libvideoio"
   version = "0.1"
   settings = "os", "compiler", "build_type", "arch"
   generators = "cmake"
   options = {"opencv_dir": "ANY"}
   default_options = "opencv_dir=''"
   requires = "TCLAP/master@jmmut/testing", \
-              "snappy/1.1.3@hoxnox/testing", \
-              "zlib/1.2.8@lasote/stable", \
               "libactive_object/0.1@amarburg/testing", \
               "g3log/0.1@amarburg/testing", \
               "liblogger/0.1@amarburg/testing"
