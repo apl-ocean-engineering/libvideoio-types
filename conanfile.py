@@ -7,6 +7,7 @@ class LibVideiIOConan(ConanFile):
   generators = "cmake"
   options = {"opencv_dir": "ANY"}
   default_options = "opencv_dir=''"
+  exports = '*'
   requires = "TCLAP/master@jmmut/testing", \
               "libactive_object/0.1@amarburg/testing", \
               "g3log/0.1@amarburg/testing", \
@@ -33,4 +34,4 @@ class LibVideiIOConan(ConanFile):
     self.run('cmake --build . %s' % cmake.build_config)
     if self.scope.dev and self.scope.build_tests:
       self.run('cp lib/libvideoio.* bin/')
-      self.run('make unit_test')
+      # self.run('make unit_test')
