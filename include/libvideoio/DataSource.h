@@ -168,5 +168,65 @@ protected:
 
 };
 
+class VideoSource : public DataSource {
+public:
+  VideoSource( const std::string &path )
+    : _path( path ),
+      _capture( path )
+  {
+       _hasDepth = false;
+       _numImages = 1;
+  }
+
+  ~VideoSource()
+{
+  if( _capture.isOpened() ) _capture.release();
+
+}
+
+
+  virtual int numFrames( void ) const
+  {
+    return 1;
+  }
+
+  virtual bool grab( void )
+  {
+    // ++_idx;
+    //
+    // if( _idx >= _paths.size() ) return false;
+    //
+    return true;
+  }
+
+  virtual int getImage( int i, cv::Mat &mat )
+  {
+    // if( i != 0 ) return 0;
+    //
+    // if( _idx >= _paths.size() ) return -1;
+    //
+    // mat = cv::imread( _paths[_idx].string(), CV_LOAD_IMAGE_GRAYSCALE );
+    // return _idx;
+    return 0;
+  }
+
+  virtual ImageSize imageSize( void ) const
+  {
+  }
+
+  bool isOpened() const
+  {
+    return _capture.isOpened();
+  }
+
+protected:
+
+  fs::path _path;
+  cv::VideoCapture _capture;
+
+
+};
+
+
 
 }
