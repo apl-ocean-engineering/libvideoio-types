@@ -1,7 +1,7 @@
 # Set source files
-file(GLOB VIDEOIO_SOURCE_FILES **/*.cpp **/**/*.cpp )
+file(GLOB VIDEOIO_SOURCE_FILES *.cpp **/*.cpp **/**/*.cpp )
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/include
 )
 
 # build shared library.

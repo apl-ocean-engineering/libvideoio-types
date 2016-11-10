@@ -5,13 +5,13 @@ class LibVideiIOConan(ConanFile):
   version = "0.1"
   settings = "os", "compiler", "build_type", "arch"
   generators = "cmake"
-  options = {"opencv_dir": "ANY"}
-  default_options = "opencv_dir=''"
+  options = {"opencv_dir": "ANY", "build_parallel": [True, False]}
+  default_options = "opencv_dir=''", "build_parallel=True"
   exports = '*'
   requires = "TCLAP/master@jmmut/testing", \
-              "libactive_object/0.1@amarburg/testing", \
-              "g3log/0.1@amarburg/testing", \
-              "liblogger/0.1@amarburg/testing"
+              "libactive_object/master@amarburg/testing", \
+              "g3log/master@amarburg/testing", \
+              "liblogger/master@amarburg/testing"
 
   def config(self):
     self.options["liblogger"].opencv_dir = self.options.opencv_dir
@@ -25,13 +25,15 @@ class LibVideiIOConan(ConanFile):
 
   def build(self):
     cmake = CMake(self.settings)
-    if self.options.opencv_dir:
-      cmake_opts = "-DOpenCV_DIR=%s" % (self.options.opencv_dir)
+    cmake_opts = ""
 
-    flag_build_tests = "-DBUILD_UNIT_TESTS=1" if self.scope.dev and self.scope.build_tests else ""
+    cmake_opts += "-DOpenCV_DIR:PATH=%s " % (self.options.opencv_dir) if self.options.opencv_dir else ""
+    cmake_opts += "-DBUILD_UNIT_TESTS=1 " if self.scope.dev and self.scope.build_tests else ""
 
-    self.run('cmake "%s" %s %s %s' % (self.conanfile_directory, cmake.command_line, cmake_opts, flag_build_tests))
-    self.run('cmake --build . %s' % cmake.build_config)
+    build_opts = "-j" if self.options.build_parallel else ""
+
+    self.run('cmake "%s" %s %s ' % (self.conanfile_directory, cmake.command_line, cmake_opts))
+    self.run('cmake --build . %s -- %s' % (cmake.build_config, build_opts))
     if self.scope.dev and self.scope.build_tests:
       self.run('cp lib/libvideoio.* bin/')
       # self.run('make unit_test')
