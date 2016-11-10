@@ -9,9 +9,9 @@ class LibVideiIOConan(ConanFile):
   default_options = "opencv_dir=''"
   exports = '*'
   requires = "TCLAP/master@jmmut/testing", \
-              "libactive_object/0.1@amarburg/testing", \
-              "g3log/0.1@amarburg/testing", \
-              "liblogger/0.1@amarburg/testing"
+              "libactive_object/master@amarburg/testing", \
+              "g3log/master@amarburg/testing", \
+              "liblogger/master@amarburg/testing"
 
   def config(self):
     self.options["liblogger"].opencv_dir = self.options.opencv_dir
