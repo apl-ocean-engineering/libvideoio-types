@@ -1,4 +1,4 @@
-include_directories( ${GTEST_INCLUDE_DIRS}
+include_directories( ${CONAN_INCLUDE_DIRS}
                      ${CMAKE_SOURCE_DIR}/lib )
 
 file( GLOB UNIT_TEST_SRCS *_test.cpp )
@@ -6,7 +6,7 @@ file( GLOB UNIT_TEST_SRCS *_test.cpp )
 add_executable( videoio_test
               ${UNIT_TEST_SRCS} )
 
-link_directories( ${GTEST_LIBRARY_DIR} )
+link_directories( ${CONAN_LIB_DIR} )
 
 target_link_libraries( videoio_test
           ${CONAN_LIBS}
