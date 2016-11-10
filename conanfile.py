@@ -2,7 +2,7 @@ from conans import ConanFile, CMake
 
 class LibVideiIOConan(ConanFile):
   name = "libvideoio"
-  version = "0.1"
+  version = "master"
   settings = "os", "compiler", "build_type", "arch"
   generators = "cmake"
   options = {"opencv_dir": "ANY", "build_parallel": [True, False]}

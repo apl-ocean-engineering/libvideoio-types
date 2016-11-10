@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.7)
-project(libvideo_tools)
+project(libvideoio)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
