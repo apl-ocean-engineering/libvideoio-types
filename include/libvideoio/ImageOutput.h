@@ -7,50 +7,21 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
+#include <opencv2/core.hpp>
+
 #include "logger/LogFields.h"
 
 namespace zed_recorder {
 
+using namespace std;
 
 class ImageOutput {
 public:
-	ImageOutput( const string &path )
-		: _path( path ),
-			_active( false )
-	{
-		if( !_path.empty() ) {
-			LOG(INFO) << "Recording to directory " << _path.string();
+	ImageOutput( const string &path );
 
-			if( !is_directory( _path ) ) {
-				LOG(WARNING) << "Making directory " << _path.string();
-				create_directory( _path );
-			}
+	void registerField( logger::FieldHandle_t handle, const string &name );
 
-			_active = true;
-		}
-	}
-
-	void registerField( logger::FieldHandle_t handle, const string &name )
-	{
-		if( handle >= 0 ) {
-			_names[handle] = name;
-			_count[handle] = 0;
-		}
-	}
-
-	bool write( logger::FieldHandle_t handle, const Mat &img, int frame = -1 )
-	{
-		if( !_active ) return true;
-		if( _names.count(handle) == 0 ) return  false;
-		char buf[80];
-		snprintf(buf, 79, "%s_%06d.png", _names[handle].c_str(), (frame < 0 ? _count[handle] : frame ) );
-		fs::path imgPath( _path );
-		imgPath /= buf;
-
-		imwrite( imgPath.string(), img );
-		_count[handle]++;
-		return true;
-	}
+	bool write( logger::FieldHandle_t handle, const cv::Mat &img, int frame = -1 );
 
 protected:
 

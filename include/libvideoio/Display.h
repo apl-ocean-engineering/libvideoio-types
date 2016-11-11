@@ -3,6 +3,7 @@
 #include "active_object/active.h"
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
 
 namespace zed_recorder {
 
@@ -33,45 +34,13 @@ public:
 
 protected:
 
-	void onShowLeft( const Mat &img )
-	{
-		cv::Mat resized;
-		cv::resize( img, resized, _displaySize );
-		imshow( "Left", resized );
-	}
+	void onShowLeft( const Mat &img );
 
-	void onShowDepth( const Mat &img )
-	{
-		cv::Mat resized;
-		cv::resize( img*255, resized, _displaySize );
-		imshow( "Display", resized );
-	}
+	void onShowDepth( const Mat &img );
 
-	void onShowRight( const Mat &img )
-	{
-		cv::Mat resized;
-		cv::resize( img, resized, _displaySize );
-		imshow( "Right", resized );
-	}
+	void onShowRight( const Mat &img );
 
-	void onShowRawStereoYUV( const Mat &img )
-	{
-		// Zed presents YUV data as 4 channels at {resolution} (e.g. 640x480)
-		// despite actually showing both Left and Right (e.g. 1280x480)
-		// This actually makes sense at YUV uses 4 bytes to show 2 pixels
-		// presumably the channels are ordered [U, Y1, V, Y2]
-		//
-		// OpenCV expects two channels of [U,Y1], [V,Y2] at the actual
-		// image resoluton (1280x480)
-		// If the byte ordering (U,Y1,V,Y2) is the same, then a simple
-		// reshape (2 channel, rows=0 means retain # of rows) should suffice
-
-		cv::Mat leftRoi( img, cv::Rect(0,0, img.cols/2, img.rows ));
-		cv::Mat leftBgr;
-		cv::resize( leftRoi, leftBgr, _displaySize );
-		cv::cvtColor( leftBgr, leftBgr, cv::COLOR_YUV2BGRA_YUYV );
-		imshow( "RawLeft", leftBgr );
-	}
+	void onShowRawStereoYUV( const Mat &img );
 
 	void onWaitKey( unsigned int k )
 	{
