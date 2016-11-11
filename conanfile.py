@@ -1,6 +1,6 @@
 from conans import ConanFile, CMake
 
-class LibVideiIOConan(ConanFile):
+class LibVideoIOConan(ConanFile):
   name = "libvideoio"
   version = "master"
   settings = "os", "compiler", "build_type", "arch"
