@@ -26,8 +26,7 @@
 #include "Camera.h"
 #include "ImageSize.h"
 
-namespace lsd_slam
-{
+namespace libvideoio {
 
 class Undistorter
 {

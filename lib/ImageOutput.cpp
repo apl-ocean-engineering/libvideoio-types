@@ -4,7 +4,7 @@
 
 #include <opencv2/highgui.hpp>
 
-namespace zed_recorder {
+namespace libvideoio {
 
 
 	ImageOutput::ImageOutput( const string &path )

@@ -24,7 +24,7 @@
 
 //#include "util/settings.h"
 
-namespace lsd_slam
+namespace libvideoio
 {
 
 Undistorter::~Undistorter()

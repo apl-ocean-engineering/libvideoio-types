@@ -19,7 +19,7 @@ namespace fs = boost::filesystem;
 #include "logger/LogReader.h"
 
 
-namespace lsd_slam {
+namespace libvideoio {
 
 
 class DataSource {
