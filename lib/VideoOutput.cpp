@@ -1,5 +1,3 @@
-#pragma once
-
 #include "VideoOutput.h"
 
 namespace libvideoio {
