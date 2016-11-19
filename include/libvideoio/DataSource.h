@@ -19,7 +19,7 @@ namespace fs = boost::filesystem;
 #include "logger/LogReader.h"
 
 
-namespace lsd_slam {
+namespace libvideoio {
 
 
 class DataSource {
@@ -170,12 +170,15 @@ protected:
 
 class VideoSource : public DataSource {
 public:
+
   VideoSource( const std::string &path )
     : _path( path ),
       _capture( path )
   {
        _hasDepth = false;
        _numImages = 1;
+
+       setFPS(  _capture.get(CV_CAP_PROP_FPS) );
   }
 
   ~VideoSource()
@@ -187,7 +190,14 @@ public:
 
   virtual int numFrames( void ) const
   {
-    return 1;
+    cv::VideoCapture &vc( const_cast< cv::VideoCapture &>(_capture) );
+    return vc.get(CV_CAP_PROP_FRAME_COUNT);
+  }
+
+  virtual int frameNum( void ) const
+  {
+    cv::VideoCapture &vc( const_cast< cv::VideoCapture &>(_capture) );
+    return vc.get(CV_CAP_PROP_POS_FRAMES);
   }
 
   virtual bool grab( void )
@@ -212,6 +222,14 @@ public:
 
   virtual ImageSize imageSize( void ) const
   {
+    return cvSize();
+  }
+
+  cv::Size cvSize( void ) const
+  {
+    cv::VideoCapture &vc( const_cast< cv::VideoCapture &>(_capture) );
+    return cv::Size( vc.get(CV_CAP_PROP_FRAME_WIDTH),
+     								 vc.get(CV_CAP_PROP_FRAME_HEIGHT) );
   }
 
   bool isOpened() const

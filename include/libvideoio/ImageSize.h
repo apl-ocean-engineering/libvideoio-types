@@ -5,7 +5,7 @@
 #include <g3log/g3log.hpp>            // Provides CHECK() macros
 
 
-namespace lsd_slam {
+namespace libvideoio {
 
 struct ImageSize {
   ImageSize( void ) : width(0), height(0) {;}

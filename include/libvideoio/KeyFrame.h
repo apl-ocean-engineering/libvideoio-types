@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace CamHD_MotionTracking {
+namespace libvideoio {
 
 
   class Keyframe {

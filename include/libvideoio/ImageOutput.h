@@ -11,7 +11,7 @@ namespace fs = boost::filesystem;
 
 #include "logger/LogFields.h"
 
-namespace zed_recorder {
+namespace libvideoio {
 
 using namespace std;
 

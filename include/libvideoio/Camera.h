@@ -5,7 +5,7 @@
 #include "Eigen/Core"
 #include "Eigen/LU"
 
-namespace lsd_slam {
+namespace libvideoio {
 
 struct Camera {
   Camera( void )

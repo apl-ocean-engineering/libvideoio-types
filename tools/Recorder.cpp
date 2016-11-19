@@ -24,7 +24,7 @@ namespace fs = boost::filesystem;
 #include "ImageOutput.h"
 #include "VideoOutput.h"
 
-using namespace lsd_slam;
+using namespace libvideoio; // New namespace
 
 bool keepGoing = true;
 
@@ -102,8 +102,8 @@ int main( int argc, char** argv )
 			exit(-1);
 		}
 
-		zed_recorder::Display display( guiSwitch.getValue() );
-		zed_recorder::ImageOutput imageOutput( imageOutputArg.getValue() );
+		Display display( guiSwitch.getValue() );
+		ImageOutput imageOutput( imageOutputArg.getValue() );
 
 		DataSource *dataSource = NULL;
 
@@ -143,7 +143,7 @@ int main( int argc, char** argv )
 		imageOutput.registerField( rightHandle, "right" );
 		imageOutput.registerField( depthHandle, "depth" );
 
-		zed_recorder::VideoOutput videoOutput( videoOutputArg.getValue(), fps > 0 ? fps : 30 );
+		VideoOutput videoOutput( videoOutputArg.getValue(), fps > 0 ? fps : 30 );
 
 		int dt_us = (fps > 0) ? (1e6/fps) : 0;
 		const float sleepFudge = 1.0;

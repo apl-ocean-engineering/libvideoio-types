@@ -2,7 +2,7 @@
 
 #include <opencv2/core.hpp>
 
-namespace CamHD_MotionTracking {
+namespace libvideoio {
 
   using cv::Mat;
 

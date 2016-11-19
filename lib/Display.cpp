@@ -1,7 +1,7 @@
 
 #include "libvideoio/Display.h"
 
-namespace zed_recorder {
+namespace libvideoio {
 
 using namespace cv;
 
