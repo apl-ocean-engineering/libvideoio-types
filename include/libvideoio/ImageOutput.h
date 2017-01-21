@@ -7,7 +7,7 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-#include <opencv2/core.hpp>
+#include <opencv2/core/core.hpp>
 
 #include "logger/LogFields.h"
 
