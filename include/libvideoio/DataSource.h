@@ -187,6 +187,10 @@ public:
 
 }
 
+  void skipTo( int frame )
+  {
+    _capture.set( CV_CAP_PROP_POS_FRAMES, frame );
+  }
 
   virtual int numFrames( void ) const
   {
@@ -202,6 +206,8 @@ public:
 
   virtual bool grab( void )
   {
+    _capture.grab();
+
     // ++_idx;
     //
     // if( _idx >= _paths.size() ) return false;
@@ -211,12 +217,7 @@ public:
 
   virtual int getImage( int i, cv::Mat &mat )
   {
-    // if( i != 0 ) return 0;
-    //
-    // if( _idx >= _paths.size() ) return -1;
-    //
-    // mat = cv::imread( _paths[_idx].string(), CV_LOAD_IMAGE_GRAYSCALE );
-    // return _idx;
+    _capture.retrieve( mat, i );
     return 0;
   }
 
