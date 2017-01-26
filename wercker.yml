@@ -11,5 +11,6 @@ build:
     - script:
       name: Upload to conan.io
       code: |
+        conan export amarburg/testing
         conan user -p "$CONAN_PASSWORD" $CONAN_USERNAME
         conan upload "*@amarburg/testing" --confirm
