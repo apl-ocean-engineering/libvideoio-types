@@ -1,6 +1,6 @@
-
-
 #pragma once
+
+#include "g3log/logmessage.hpp"
 
 struct ColorStderrSink {
 

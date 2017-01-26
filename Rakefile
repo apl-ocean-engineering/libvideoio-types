@@ -2,9 +2,9 @@
 task :default => "debug:test"
 
 @conan_opts = {  build_parallel: 'False' }
-@conan_settings = {  }
+@conan_settings = {} # "compiler": "gcc", "compiler.libcxx": "libstdc++11"}
 @conan_scopes = { build_tests: 'True' }
-@conan_build = "missing"
+@conan_build = [' ']   # This is the same as build all
 load 'config.rb' if FileTest.readable? 'config.rb'
 
 build_root = ENV['BUILD_ROOT'] || "build"
@@ -21,7 +21,8 @@ build_root = ENV['BUILD_ROOT'] || "build"
     task :build do
       FileUtils::mkdir build_dir unless FileTest::directory? build_dir
       chdir build_dir do
-        sh "conan install %s .. --build=%s" % [conan_opts.join(' '), @conan_build]
+        sh "conan install %s .. %s" % [conan_opts.join(' '),
+            @conan_build.size > 0  ? @conan_build.map{|c| "--build #{c} "}.join(' ') : ""]
         sh "conan build .."
       end
     end
