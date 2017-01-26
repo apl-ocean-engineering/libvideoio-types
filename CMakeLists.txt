@@ -43,6 +43,12 @@ endif()
 
 find_package(OpenCV ${OPENCV_VERSION} COMPONENTS ${OPENCV_COMPONENTS} REQUIRED)
 
+## Screwy problem I started having after upgrading to Sierra.
+IF( APPLE )
+	include_directories( /usr/local/include )
+	link_directories( /usr/local/lib )
+endif()
+
 ## Set global include paths
 set( VIDEOIO_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/include/libvideoio
