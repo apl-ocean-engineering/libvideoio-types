@@ -6,7 +6,7 @@ build:
     - script:
       name: Debug test
       code: |
-           rake debug:test
+           VERBOSE=1 rake debug:test
 
     - script:
       name: Upload to conan.io
