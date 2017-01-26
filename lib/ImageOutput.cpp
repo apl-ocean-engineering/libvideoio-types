@@ -2,7 +2,7 @@
 #include "libvideoio/ImageOutput.h"
 #include "logger/LogFields.h"
 
-#include <opencv2/highgui.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace libvideoio {
 
