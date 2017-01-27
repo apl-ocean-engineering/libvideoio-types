@@ -9,7 +9,7 @@ include_directories(
 # )
 
 add_executable( Recorder Recorder.cpp)
-target_link_libraries( Recorder videoio )
+target_link_libraries( Recorder videoio pthread )
 set_target_properties( Recorder PROPERTIES COMPILE_FLAGS "-ggdb")
 
 
