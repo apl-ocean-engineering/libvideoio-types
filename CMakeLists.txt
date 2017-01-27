@@ -6,6 +6,7 @@ conan_basic_setup()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+find_package( Threads )
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Eigen3 REQUIRED )
 
