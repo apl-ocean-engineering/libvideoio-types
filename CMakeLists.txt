@@ -42,7 +42,7 @@ if( CUDA_VERSION )
 	find_package( CUDA )
 endif()
 
-find_package(OpenCV ${OPENCV_VERSION} COMPONENTS ${OPENCV_COMPONENTS} REQUIRED)
+find_package(OpenCV COMPONENTS ${OPENCV_COMPONENTS} REQUIRED)
 
 ## Screwy problem I started having after upgrading to Sierra.
 IF( APPLE )
