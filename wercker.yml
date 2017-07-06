@@ -9,9 +9,9 @@ build:
            echo '@conan_settings = {"compiler": "gcc", "compiler.libcxx": "libstdc++11"}' > config.rb
            VERBOSE=1 rake debug:test
 
-    - script:
-      name: Upload to conan.io
-      code: |
-        conan export amarburg/testing
-        conan user -p "$CONAN_PASSWORD" $CONAN_USERNAME
-        conan upload "*@amarburg/testing" --confirm
+    # - script:
+    #   name: Upload to conan.io
+    #   code: |
+    #     conan export amarburg/testing
+    #     conan user -p "$CONAN_PASSWORD" $CONAN_USERNAME
+    #     conan upload "*@amarburg/testing" --confirm
