@@ -1,13 +1,15 @@
+#include "g3log/g3log.hpp"
+
 #include "VideoOutput.h"
 
 namespace libvideoio {
 
 	VideoOutput::VideoOutput( const std::string &filename, float fps, const std::string &fourcc )
-		: _file( filename ),
-			_active( false ),
-			_writer(),
-			_fps( fps ),
-			_fourcc( fourcc )
+	: _file( filename ),
+	_active( false ),
+	_writer(),
+	_fps( fps ),
+	_fourcc( fourcc )
 	{
 
 		if( !_file.empty() ) {
@@ -29,12 +31,10 @@ namespace libvideoio {
 
 			_writer.reset( new cv::VideoWriter(_file.string(), CV_FOURCC(fcc[0], fcc[1], fcc[2], fcc[3]), _fps, cv::Size(img.cols, img.rows)));
 
-			if( ! _writer->isOpened() )
-				LOG(FATAL) << "Unable to open video writer.";
+			LOG_IF( FATAL, _writer->isOpened() == false) << "Unable to open video writer.";
 		}
 
-	LOG(INFO) << "writing...";
-	_writer->write( img );
+		_writer->write( img );
 
 		return true;
 	}

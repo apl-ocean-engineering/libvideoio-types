@@ -10,10 +10,7 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-#include "logger/LogFields.h"
-
 namespace libvideoio {
-
 
 class VideoOutput {
 public:
@@ -32,6 +29,5 @@ protected:
 
 	std::string _fourcc;
 };
-
 
 }
