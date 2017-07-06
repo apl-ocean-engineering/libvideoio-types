@@ -17,8 +17,10 @@ namespace libvideoio {
 
 class VideoOutput {
 public:
-	VideoOutput( const std::string &filename, float fps );
+	VideoOutput( const std::string &filename, float fps, const std::string &fourcc = "AVC1" );
 	bool write( const cv::Mat &img );
+
+	bool isActive( void ) const { return _active; }
 
 protected:
 
@@ -28,6 +30,7 @@ protected:
 	std::unique_ptr< cv::VideoWriter > _writer;
 	float _fps;
 
+	std::string _fourcc;
 };
 
 

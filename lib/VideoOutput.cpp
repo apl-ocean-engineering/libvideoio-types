@@ -2,12 +2,14 @@
 
 namespace libvideoio {
 
-	VideoOutput::VideoOutput( const std::string &filename, float fps )
+	VideoOutput::VideoOutput( const std::string &filename, float fps, const std::string &fourcc )
 		: _file( filename ),
 			_active( false ),
 			_writer(),
-			_fps( fps )
+			_fps( fps ),
+			_fourcc( fourcc )
 	{
+
 		if( !_file.empty() ) {
 			LOG(INFO) << "Recording to video file " << _file.string();
 			_active = true;
@@ -22,7 +24,10 @@ namespace libvideoio {
 		// Eager-create the writer
 		if( !_writer ) {
 			LOG(INFO) << "Opening video at " << _fps << " fps with size " << img.cols << " x " << img.rows;
-			_writer.reset( new cv::VideoWriter(_file.string(), CV_FOURCC('A','V','C','1'), _fps, cv::Size(img.cols, img.rows)));
+
+			const char *fcc = _fourcc.c_str();
+
+			_writer.reset( new cv::VideoWriter(_file.string(), CV_FOURCC(fcc[0], fcc[1], fcc[2], fcc[3]), _fps, cv::Size(img.cols, img.rows)));
 
 			if( ! _writer->isOpened() )
 				LOG(FATAL) << "Unable to open video writer.";
