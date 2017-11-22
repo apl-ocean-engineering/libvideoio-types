@@ -18,7 +18,7 @@
 * along with LSD-SLAM. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Undistorter.h"
+#include "libvideoio/Undistorter.h"
 
 #include <fstream>
 

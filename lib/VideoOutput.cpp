@@ -1,6 +1,6 @@
 #include "g3log/g3log.hpp"
 
-#include "VideoOutput.h"
+#include "libvideoio/VideoOutput.h"
 
 namespace libvideoio {
 

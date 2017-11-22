@@ -54,8 +54,7 @@ find_package(OpenCV COMPONENTS ${OPENCV_COMPONENTS} REQUIRED)
 
 ## Set global include paths
 set( VIDEOIO_INCLUDE_DIRS
-	${CMAKE_SOURCE_DIR}/include/libvideoio
-	${CONAN_INCLUDE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/include
   ${OpenCV_INCLUDE_DIRS}
 	${EIGEN3_INCLUDE_DIR} )
 include_directories( ${VIDEOIO_INCLUDE_DIRS} )
@@ -70,4 +69,8 @@ if( FIPS_UNITTESTS )
 	if( FIPS_UNITTESTS_RUN_AFTER_BUILD )
     ## TODO
   endif()
+endif()
+
+if( NOT FIPS_IMPORT)
+	fips_finish()
 endif()

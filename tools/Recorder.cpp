@@ -13,16 +13,16 @@ namespace fs = boost::filesystem;
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
 
-#include "G3LogSinks.h"
+#include "libvideoio/G3LogSinks.h"
 
-#include "DataSource.h"
-#include "Undistorter.h"
+#include "libvideoio/DataSource.h"
+#include "libvideoio/Undistorter.h"
 
 #include "logger/LogWriter.h"
 
-#include "Display.h"
-#include "ImageOutput.h"
-#include "VideoOutput.h"
+#include "libvideoio/Display.h"
+#include "libvideoio/ImageOutput.h"
+#include "libvideoio/VideoOutput.h"
 
 using namespace libvideoio; // New namespace
 
