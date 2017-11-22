@@ -4,3 +4,9 @@ imports:
     liblogger:
         git: https://github.com/amarburg/liblogger.git
         branch: fips
+
+exports:
+  header-dirs:
+    - include/
+  modules:
+    videoio: .
