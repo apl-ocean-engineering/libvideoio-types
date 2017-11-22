@@ -5,9 +5,8 @@ include_directories(
 )
 
 # build shared library.
-add_library( videoio SHARED ${VIDEOIO_SOURCE_FILES})
-target_link_libraries( videoio
-  ${Boost_LIBRARIES}
-  ${OpenCV_LIBS}
-  ${CONAN_LIBS}
-)
+fips_begin_module( videoio )
+  fips_files( ${VIDEOIO_SOURCE_FILES})
+  fips_libs( ${Boost_LIBRARIES} ${OpenCV_LIBS} ${ZLIB_LIBRARIES} )
+  fips_deps( logger g3log )
+fips_end_module()

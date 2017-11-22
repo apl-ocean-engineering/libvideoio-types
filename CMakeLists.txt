@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 2.8.7)
-project(libvideoio)
+cmake_minimum_required(VERSION 3.5)
+if( NOT FIPS_IMPORT )
+	get_filename_component(FIPS_ROOT_DIR "../fips" ABSOLUTE)
+	include("${FIPS_ROOT_DIR}/cmake/fips.cmake")
+endif()
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+fips_setup(PROJECT libvideoio)
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
+find_package( ZLIB REQUIRED )
 find_package( Threads )
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Eigen3 REQUIRED )
@@ -17,9 +18,7 @@ list(APPEND OPENCV_COMPONENTS core highgui imgproc video calib3d )
 EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 message( STATUS "Architecture: ${ARCHITECTURE}" )
 if( ${ARCHITECTURE} STREQUAL "aarch64" )
-
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a") # -DENABLE_NEON" )
-
 elseif( ${ARCHITECTURE} STREQUAL "x86_64" )
   # -DENABLE_SSE enables Jakob's original SSE optimizations in his code,
 	# it has nothing to do with compiler behavior
@@ -44,11 +43,11 @@ endif()
 
 find_package(OpenCV COMPONENTS ${OPENCV_COMPONENTS} REQUIRED)
 
-## Screwy problem I started having after upgrading to Sierra.
-IF( APPLE )
-	include_directories( /usr/local/include )
-	link_directories( /usr/local/lib )
-endif()
+# ## Screwy problem I started having after upgrading to Sierra.
+# IF( APPLE )
+# 	include_directories( /usr/local/include )
+# 	link_directories( /usr/local/lib )
+# endif()
 
 ## Set global include paths
 set( VIDEOIO_INCLUDE_DIRS
@@ -58,10 +57,14 @@ set( VIDEOIO_INCLUDE_DIRS
 	${EIGEN3_INCLUDE_DIR} )
 include_directories( ${VIDEOIO_INCLUDE_DIRS} )
 
-add_subdirectory("lib/")
-add_subdirectory("tools/")
+fips_add_subdirectory("lib/")
+fips_add_subdirectory("tools/")
 
-option( BUILD_UNIT_TESTS "Build unit tests" OFF )
-if( BUILD_UNIT_TESTS )
-  add_subdirectory( test/unit/ )
+
+if( FIPS_UNITTESTS )
+  fips_add_subdirectory( test/unit/ )
+
+	if( FIPS_UNITTESTS_RUN_AFTER_BUILD )
+    ## TODO
+  endif()
 endif()

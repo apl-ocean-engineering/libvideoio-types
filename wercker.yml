@@ -4,14 +4,8 @@ box: amarburg/lsdslam-dev-host:conan-latest
 build:
   steps:
     - script:
-      name: Debug test
+      name: Build
       code: |
-           echo '@conan_settings = {"compiler": "gcc", "compiler.libcxx": "libstdc++11"}' > config.rb
-           VERBOSE=1 rake debug:test
-
-    # - script:
-    #   name: Upload to conan.io
-    #   code: |
-    #     conan export amarburg/testing
-    #     conan user -p "$CONAN_PASSWORD" $CONAN_USERNAME
-    #     conan upload "*@amarburg/testing" --confirm
+          ./fips set config linux-make-unittest
+          ./fips build
+          ./fips run videoioTest
