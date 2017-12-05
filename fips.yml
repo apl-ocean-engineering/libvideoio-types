@@ -10,3 +10,7 @@ exports:
     - include/
   modules:
     videoio: .
+
+defines:
+  FIPS_EXCEPTIONS: ON
+  FIPS_RTTI: ON
