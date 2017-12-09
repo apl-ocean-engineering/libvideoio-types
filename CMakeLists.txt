@@ -63,16 +63,20 @@ set( VIDEOIO_INCLUDE_DIRS
 include_directories( ${VIDEOIO_INCLUDE_DIRS} )
 
 fips_add_subdirectory("lib/")
-fips_add_subdirectory("tools/")
 
+if( NOT FIPS_IMPORT )
+	fips_add_subdirectory("tools/")
 
-if( FIPS_UNITTESTS )
-  fips_add_subdirectory( test/unit/ )
+	if( FIPS_UNITTESTS )
+	  fips_add_subdirectory( test/unit/ )
 
-	if( FIPS_UNITTESTS_RUN_AFTER_BUILD )
-    ## TODO
-  endif()
+		if( FIPS_UNITTESTS_RUN_AFTER_BUILD )
+	    ## TODO
+	  endif()
+	endif()
+
 endif()
+
 
 if( NOT FIPS_IMPORT)
 	fips_finish()

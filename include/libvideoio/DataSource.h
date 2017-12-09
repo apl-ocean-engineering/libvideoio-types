@@ -79,6 +79,21 @@ public:
 
   }
 
+  ImagesSource( const std::vector<fs::path> &paths )
+    : _idx( -1 )
+  {
+    for( fs::path p : paths ) {
+      if( fs::is_directory( p ) )
+        getdir( p, _paths );
+      else
+        _paths.push_back(p);
+
+      _hasDepth = false;
+      _numImages = 1;
+    }
+
+  }
+
   virtual int numFrames( void ) const { return _paths.size(); }
 
   virtual bool grab( void )
