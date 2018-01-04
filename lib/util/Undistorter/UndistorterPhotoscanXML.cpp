@@ -34,7 +34,8 @@ namespace libvideoio
 
 UndistorterPhotoscanXML::UndistorterPhotoscanXML(const char* configFileName)
   :   _originalK( cv::Mat(3, 3, CV_64F, cv::Scalar(0)) ),
-      _distCoeffs( cv::Mat(1,4, CV_64F, cv::Scalar(0)) )
+      _distCoeffs( cv::Mat(1,4, CV_64F, cv::Scalar(0)) ),
+      _valid(true)
 {
 
   XMLDocument doc;
@@ -61,7 +62,7 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const char* configFileName)
     }
   }
 
-  double f,cx,cy;
+  double f=1.0, cx=0.0, cy=0.0;
 
   {
     auto focalNode = calibrationNode->FirstChildElement("f");

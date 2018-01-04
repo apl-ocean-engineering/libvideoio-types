@@ -25,6 +25,8 @@
 #include "libvideoio/Camera.h"
 #include "libvideoio/ImageSize.h"
 
+#include "libvideoio/Undistorter.h"
+
 
 namespace libvideoio {
 

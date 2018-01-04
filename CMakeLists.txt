@@ -9,8 +9,10 @@ endif()
 
 find_package( ZLIB REQUIRED )
 find_package( Threads )
-find_package(Boost COMPONENTS filesystem system REQUIRED)
-find_package(Eigen3 REQUIRED )
+find_package( Boost COMPONENTS filesystem system REQUIRED)
+find_package( Eigen3 REQUIRED )
+
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package( TinyXML2 REQUIRED )
 
 
@@ -65,14 +67,13 @@ include_directories( ${VIDEOIO_INCLUDE_DIRS} )
 fips_add_subdirectory("lib/")
 
 if( NOT FIPS_IMPORT )
+	set( TEST_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/data" )
+	add_definitions( -DTEST_DATA_DIR=${TEST_DATA_DIR} )
+
 	fips_add_subdirectory("tools/")
 
 	if( FIPS_UNITTESTS )
 	  fips_add_subdirectory( test/unit/ )
-
-		if( FIPS_UNITTESTS_RUN_AFTER_BUILD )
-	    ## TODO
-	  endif()
 	endif()
 
 endif()
