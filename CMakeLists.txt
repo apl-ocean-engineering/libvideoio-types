@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 if( NOT FIPS_IMPORT )
-	cmake_minimum_required(VERSION 3.5)
-
 	get_filename_component(FIPS_ROOT_DIR "../fips" ABSOLUTE)
 	include("${FIPS_ROOT_DIR}/cmake/fips.cmake")
 
@@ -13,6 +11,7 @@ find_package( ZLIB REQUIRED )
 find_package( Threads )
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Eigen3 REQUIRED )
+find_package( TinyXML2 REQUIRED )
 
 
 EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
@@ -59,6 +58,7 @@ endif()
 set( VIDEOIO_INCLUDE_DIRS
 	${CMAKE_CURRENT_SOURCE_DIR}/include
   ${OpenCV_INCLUDE_DIRS}
+	${TINYXML2_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR} )
 include_directories( ${VIDEOIO_INCLUDE_DIRS} )
 
