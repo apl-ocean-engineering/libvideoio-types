@@ -22,8 +22,6 @@
 
 #include <fstream>
 
-//#include "util/settings.h"
-
 namespace libvideoio
 {
 
@@ -32,30 +30,30 @@ Undistorter* UndistorterFactory::getUndistorterForFile(const std::string &config
 {
 	LOG(INFO) << "Reading Calibration from file " << configFilename;
 
-	// std::ifstream f(configFilename.c_str());
-	// if (!f.good())
-	// {
-	// 	LOG(FATAL) << " ... not found. Cannot operate without calibration, shutting down.";
-	// 	f.close();
-	// 	return NULL;
-	// }
-  //
-	// std::string l1;
-	// std::getline(f,l1);
-	// f.close();
-  //
-  //
-  //
-	// float ic[10];
-	// if(std::sscanf(l1.c_str(), "%f %f %f %f %f %f %f %f",
-	// 		&ic[0], &ic[1], &ic[2], &ic[3], &ic[4],
-	// 		&ic[5], &ic[6], &ic[7]) == 8)
-	// {
-	// 	LOG(INFO) << "found OpenCV camera model, building rectifier.";
-	// 	Undistorter* u = new UndistorterOpenCV(configFilename.c_str());
-	// 	if(!u->isValid()) return 0;
-	// 	return u;
-	// }
+	std::ifstream f(configFilename.c_str());
+	if (!f.good())
+	{
+		LOG(FATAL) << " ... not found. Cannot operate without calibration, shutting down.";
+		f.close();
+		return NULL;
+	}
+
+	std::string l1;
+	std::getline(f,l1);
+	f.close();
+
+
+
+	float ic[10];
+	if(std::sscanf(l1.c_str(), "%f %f %f %f %f %f %f %f",
+			&ic[0], &ic[1], &ic[2], &ic[3], &ic[4],
+			&ic[5], &ic[6], &ic[7]) == 8)
+	{
+		LOG(INFO) << "found OpenCV camera model, building rectifier.";
+
+		return OpenCVUndistorterFactory::loadFromFile(configFilename);
+	}
+
 	// else if(std::sscanf(l1.c_str(), "%f %f %f %f %f",
 	// 			&ic[0], &ic[1], &ic[2], &ic[3], &ic[4]) == 5)
 	// {

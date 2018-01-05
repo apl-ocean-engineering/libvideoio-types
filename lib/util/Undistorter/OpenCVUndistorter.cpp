@@ -30,11 +30,11 @@ namespace libvideoio
   cv::initUndistortRectifyMap(_originalK, _distCoeffs, cv::Mat(), _K,
                       _outputSize(), CV_16SC2, _map1, _map2);
 
-  //
-  // originalK_.at<double>(0, 0) /= in_width;
-  // originalK_.at<double>(0, 2) /= in_width;
-  // originalK_.at<double>(1, 1) /= in_height;
-  // originalK_.at<double>(1, 2) /= in_height;
+  // Need to check on validity of this
+  _originalK.at<double>(0, 0) /= _inputSize.width;
+  _originalK.at<double>(0, 2) /= _inputSize.width;
+  _originalK.at<double>(1, 1) /= _inputSize.height;
+  _originalK.at<double>(1, 2) /= _inputSize.height;
 
 }
 

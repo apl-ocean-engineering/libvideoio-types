@@ -51,30 +51,13 @@ public:
 	 */
 	virtual const cv::Mat getOriginalK() const = 0;
 
-	virtual ImageSize outputImageSize( void ) const { return inputImageSize(); };
-
-	/**
-	 * Returns the width of the undistorted images in pixels.
-	 */
-	virtual int getOutputWidth() const { return outputImageSize().width; };
-
-	/**
-	 * Returns the height of the undistorted images in pixels.
-	 */
-	virtual int getOutputHeight() const { return outputImageSize().height; };
-
 	virtual ImageSize inputImageSize( void ) const = 0;
-
-	/**
-	 * Returns the width of the input images in pixels.
-	 */
 	virtual int getInputWidth() const { return inputImageSize().width; };
-
-	/**
-	 * Returns the height of the input images in pixels.
-	 */
 	virtual int getInputHeight() const { return inputImageSize().height; };
 
+	virtual ImageSize outputImageSize( void ) const { return inputImageSize(); };
+	virtual int getOutputWidth() const { return outputImageSize().width; };
+	virtual int getOutputHeight() const { return outputImageSize().height; };
 
 	/**
 	 * Returns if the undistorter was initialized successfully.
@@ -84,12 +67,17 @@ public:
 };
 
 
-class PhotoscanXMLUndistorterFactory;
-
-
+// An OpenCVUndistorter uses the OpenCV map() function for
+// undistortion and takes the standard 4- (or more) coefficient
+// tangential distortion model
 class OpenCVUndistorter : public Undistorter
 {
 public:
+
+	OpenCVUndistorter( const cv::Mat &k,
+											const cv::Mat &distCoeff,
+											const ImageSize &origSize );
+
 	virtual ~OpenCVUndistorter();
 
 	/**
@@ -123,12 +111,6 @@ public:
 
 protected:
 
-	friend class PhotoscanXMLUndistorterFactory;
-
-	OpenCVUndistorter( const cv::Mat &k,
-											const cv::Mat &distCoeff,
-											const ImageSize &origSize );
-
 	cv::Mat _K, _originalK;
 	cv::Mat _distCoeffs;
 
@@ -149,6 +131,7 @@ protected:
 class UndistorterFactory {
 public:
 	/**
+	 * This function attempts to auto-detect the calibration file type.
 	 * Creates and returns an Undistorter of the type used by the given
 	 * configuration file. If the format is not recognized, returns nullptr.
 	 */
@@ -159,9 +142,13 @@ public:
 class PhotoscanXMLUndistorterFactory : public UndistorterFactory {
 public:
 	static OpenCVUndistorter *loadFromFile( const std::string &filename );
+};
 
-private:
-	PhotoscanXMLUndistorterFactory() = delete;
+
+
+class OpenCVUndistorterFactory : public UndistorterFactory {
+public:
+	static OpenCVUndistorter *loadFromFile( const std::string &filename );
 };
 
 //

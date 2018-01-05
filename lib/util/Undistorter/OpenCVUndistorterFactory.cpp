@@ -10,9 +10,18 @@
 namespace libvideoio
 {
 
-UndistorterOpenCV::UndistorterOpenCV(const char* configFileName)
+	// 	/**
+	// 	 * Creates an Undistorter by reading the distortion parameters from a file.
+	// 	 *
+	// 	 * The file format is as follows:
+	// 	 * fx fy cx cy d1 d2 d3 d4 d5 d6
+	// 	 * inputWidth inputHeight
+	// 	 * crop / full / none
+	// 	 * outputWidth outputHeight
+	// 	 */
+OpenCVUndistorter *OpenCVUndistorterFactory::loadFromFile( const std::string &configFileName)
 {
-	valid = true;
+	bool valid = true;
 
 	// read parameters
 	std::ifstream infile(configFileName);
@@ -24,6 +33,11 @@ UndistorterOpenCV::UndistorterOpenCV(const char* configFileName)
 	std::getline(infile,l2);
 	std::getline(infile,l3);
 	std::getline(infile,l4);
+
+	float inputCalibration[10];
+	float outputCalibration;
+	int out_width, out_height;
+	int in_width, in_height;
 
 	// l1 & l2
 	if(std::sscanf(l1.c_str(), "%f %f %f %f %f %f %f %f",
@@ -39,7 +53,7 @@ UndistorterOpenCV::UndistorterOpenCV(const char* configFileName)
 	}
 	else
 	{
-		printf("Failed to read camera calibration (invalid format?)\nCalibration file: %s\n", configFileName);
+		printf("Failed to read camera calibration (invalid format?)\nCalibration file: %s\n", configFileName.c_str());
 		valid = false;
 	}
 
@@ -97,76 +111,32 @@ UndistorterOpenCV::UndistorterOpenCV(const char* configFileName)
 			inputCalibration[3]);
 	}
 
-	originalK_ = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
-	originalK_.at<double>(0, 0) = inputCalibration[0];
-	originalK_.at<double>(1, 1) = inputCalibration[1];
-	originalK_.at<double>(2, 2) = 1;
-	originalK_.at<double>(0, 2) = inputCalibration[2];
-	originalK_.at<double>(1, 2) = inputCalibration[3];
+	cv::Mat originalK(3, 3, CV_64F, cv::Scalar(0));
+	originalK.at<double>(0, 0) = inputCalibration[0];
+	originalK.at<double>(1, 1) = inputCalibration[1];
+	originalK.at<double>(2, 2) = 1;
+	originalK.at<double>(0, 2) = inputCalibration[2];
+	originalK.at<double>(1, 2) = inputCalibration[3];
 
 	if (valid)
 	{
-		K_ = cv::getOptimalNewCameraMatrix(originalK_, distCoeffs, cv::Size(in_width, in_height), (outputCalibration == -2) ? 1 : 0, cv::Size(out_width, out_height), nullptr, false);
-
-		cv::initUndistortRectifyMap(originalK_, distCoeffs, cv::Mat(), K_,
-				cv::Size(out_width, out_height), CV_16SC2, map1, map2);
-
-		originalK_.at<double>(0, 0) /= in_width;
-		originalK_.at<double>(0, 2) /= in_width;
-		originalK_.at<double>(1, 1) /= in_height;
-		originalK_.at<double>(1, 2) /= in_height;
+		return new OpenCVUndistorter( originalK, distCoeffs, ImageSize( in_width, in_height ));
+    //
+		// K_ = cv::getOptimalNewCameraMatrix(originalK_, distCoeffs, cv::Size(in_width, in_height), (outputCalibration == -2) ? 1 : 0, cv::Size(out_width, out_height), nullptr, false);
+    //
+		// cv::initUndistortRectifyMap(originalK_, distCoeffs, cv::Mat(), K_,
+		// 		cv::Size(out_width, out_height), CV_16SC2, map1, map2);
+    //
+		// originalK_.at<double>(0, 0) /= in_width;
+		// originalK_.at<double>(0, 2) /= in_width;
+		// originalK_.at<double>(1, 1) /= in_height;
+		// originalK_.at<double>(1, 2) /= in_height;
 	}
 
-	originalK_ = originalK_.t();
-	K_ = K_.t();
-}
+	// originalK_ = originalK_.t();
+	// K_ = K_.t();
 
-UndistorterOpenCV::~UndistorterOpenCV()
-{
-}
-
-void UndistorterOpenCV::undistort(const cv::Mat& image, cv::OutputArray result) const
-{
-	cv::remap(image, result, map1, map2, cv::INTER_LINEAR);
-}
-
-const Camera UndistorterOpenCV::getCamera() const
-{
-	return Camera( K_ );
-}
-
-const cv::Mat UndistorterOpenCV::getK() const
-{
-	return K_;
-}
-
-const cv::Mat UndistorterOpenCV::getOriginalK() const
-{
-	return originalK_;
-}
-
-int UndistorterOpenCV::getOutputWidth() const
-{
-	return out_width;
-}
-
-int UndistorterOpenCV::getOutputHeight() const
-{
-	return out_height;
-}
-int UndistorterOpenCV::getInputWidth() const
-{
-	return in_width;
-}
-
-int UndistorterOpenCV::getInputHeight() const
-{
-	return in_height;
-}
-
-bool UndistorterOpenCV::isValid() const
-{
-	return valid;
+	return nullptr;
 }
 
 }
