@@ -32,15 +32,28 @@ namespace libvideoio
   //   <date>2017-11-14T23:30:12Z</date>
   // </calibration>
 
-template <typename T> bool readFromCalibration<int>( const XMLNode *parent, string name, T &value )
+bool readDoubleFromCalibration( const XMLNode *parent, std::string name, double &value, double def = 0.0 )
 {
-  auto child = parent->FirstChildElement(name);
+  auto child = parent->FirstChildElement(name.c_str());
   if( child ) {
-    value = atoi( child->GetText() );
-    return True;
+    value = atof(child->GetText());
+    return true;
   }
 
-  return False;
+  value = def;
+  return false;
+}
+
+bool readIntFromCalibration( const XMLNode *parent, std::string name, int &value, int def = 0 )
+{
+  auto child = parent->FirstChildElement(name.c_str());
+  if( child ) {
+    value = atoi(child->GetText());
+    return true;
+  }
+
+  value = def;
+  return false;
 }
 
 UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileName)
@@ -52,53 +65,23 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
   XMLDocument doc;
   doc.LoadFile( configFileName.c_str() );
 
-  auto calibrationNode = doc.FirstChildElement( "calibration" );
+  auto topNode = doc.FirstChildElement( "calibration" );
 
-  if( !calibrationNode ) {
+  if( !topNode ) {
     LOG(WARNING) << "Unable to find top-level element <\"calibration\"> calibration file " << configFileName;
     _valid = false;
     return;
   }
 
-  _valid = readFromCalibration<int>(calibrationNode, "width"< _width );
+  _valid = readIntFromCalibration(topNode, "width", _width );
+  _valid = readIntFromCalibration(topNode, "height", _height );
 
-  {
-    auto heightNode = calibrationNode->FirstChildElement("height");
-    if( heightNode ) {
-      _height = atoi( heightNode->GetText() );
-    } else {
-      _valid = false;
-    }
-  }
 
   double f=1.0, cx=0.0, cy=0.0;
 
-  {
-    auto focalNode = calibrationNode->FirstChildElement("f");
-    if( focalNode ) {
-      f = atof( focalNode->GetText() );
-    } else {
-      _valid = false;
-    }
-  }
-
-  {
-    auto cxNode = calibrationNode->FirstChildElement("cx");
-    if( cxNode ) {
-      cx = atof( cxNode->GetText() );
-    } else {
-      _valid = false;
-    }
-  }
-
-  {
-    auto cyNode = calibrationNode->FirstChildElement("cy");
-    if( cyNode ) {
-      f = atof( cyNode->GetText() );
-    } else {
-      _valid = false;
-    }
-  }
+  _valid = readDoubleFromCalibration(topNode, "f", f);
+  _valid = readDoubleFromCalibration(topNode, "cx", cx);
+  _valid = readDoubleFromCalibration(topNode, "cy", cy);
 
 	_originalK.at<double>(0, 0) = f;
 	_originalK.at<double>(1, 1) = f;
@@ -109,48 +92,24 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
 
   // This distortion elements are optional (no error if not found)
 
-  // TODO: What are Photoscan's b1 and b2 coefficients ... look up in manual?
-  {
-    auto node = calibrationNode->FirstChildElement("b1");
-    if( node ) {
-    //  _b[0] = atof( node->GetText() );
-    }
+  // readDoubleFromCalibration( topNode, "b1", _b[0] );
+  // readDoubleFromCalibration( topNode, "b2", _b[1] );
+
+  double val;
+  if( readDoubleFromCalibration( topNode, "k1", val ) ) {
+  //     _distCoeffs.at<double>(0,0) = val;
   }
 
-  {
-    auto node = calibrationNode->FirstChildElement("b2");
-    if( node ) {
-    //  _b[1] = atof( node->GetText() );
-    }
-  }
-
-  // {
-  //   auto node = calibrationNode->FirstChildElement("k1");
-  //   if( node ) {
-  //     _distCoeffs.at<double>(0,0) = atof( node->GetText() );
-  //   }
-  // }
-  //
-  // {
-  //   auto node = calibrationNode->FirstChildElement("k2");
-  //   if( node ) {
+  readDoubleFromCalibration( topNode, "k2", val );
   //     _distCoeffs.at<double>(0,1) = atof( node->GetText() );
-  //   }
-  // }
-  //
-  // {
-  //   auto node = calibrationNode->FirstChildElement("p1");
-  //   if( node ) {
+
+  readDoubleFromCalibration( topNode, "p1", val );
   //     _distCoeffs.at<double>(0,2) = atof( node->GetText() );
-  //   }
-  // }
-  //
-  // {
-  //   auto node = calibrationNode->FirstChildElement("p2");
-  //   if( node ) {
+
+  readDoubleFromCalibration( topNode, "p2", val );
   //     _distCoeffs.at<double>(0,3) = atof( node->GetText() );
-  //   }
-  // }
+
+
 
 
 	if (_valid) {
