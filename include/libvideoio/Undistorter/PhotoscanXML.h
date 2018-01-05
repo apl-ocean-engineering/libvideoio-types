@@ -59,7 +59,7 @@ class UndistorterPhotoscanXML : public Undistorter
 {
 public:
 
-	UndistorterPhotoscanXML(const char* configFileName);
+	UndistorterPhotoscanXML(const std::string &configFileName);
 	~UndistorterPhotoscanXML();
 
 	// Remove the copy operators

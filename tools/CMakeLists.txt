@@ -1,11 +1,13 @@
 
 fips_begin_app( recorder cmdline )
   fips_files( Recorder.cpp )
-  fips_libs( videoio ${CMAKE_THREAD_LIBS_INIT} )
-  # set_target_properties( recorder PROPERTIES COMPILE_FLAGS "-ggdb")
+  fips_deps( videoio )
+  #fips_libs( ${CMAKE_THREAD_LIBS_INIT} )
+fips_end_app()
 
-  include_directories(
-    ${VIDEOIO_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}
-  )
+
+fips_begin_app( undistort cmdline )
+  fips_files( Undistort.cpp )
+  fips_deps( videoio )
+  #fips_libs( ${CMAKE_THREAD_LIBS_INIT} )
 fips_end_app()

@@ -32,14 +32,14 @@ namespace libvideoio
   //   <date>2017-11-14T23:30:12Z</date>
   // </calibration>
 
-UndistorterPhotoscanXML::UndistorterPhotoscanXML(const char* configFileName)
+UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileName)
   :   _originalK( cv::Mat(3, 3, CV_64F, cv::Scalar(0)) ),
       _distCoeffs( cv::Mat(1,4, CV_64F, cv::Scalar(0)) ),
       _valid(true)
 {
 
   XMLDocument doc;
-  doc.LoadFile( configFileName );
+  doc.LoadFile( configFileName.c_str() );
 
   auto calibrationNode = doc.FirstChildElement( "calibration" );
 
