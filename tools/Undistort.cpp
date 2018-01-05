@@ -1,12 +1,12 @@
 //
 // #include <string>
 // using namespace std;
-//
-// #include <opencv2/opencv.hpp>
-//
-// #define BOOST_FILESYSTEM_NO_DEPRECATED
-// #include <boost/filesystem.hpp>
-// namespace fs = boost::filesystem;
+
+#include <opencv2/imgcodecs.hpp>
+
+#define BOOST_FILESYSTEM_NO_DEPRECATED
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 #include <tclap/CmdLine.h>
 
@@ -46,13 +46,13 @@ int main( int argc, char** argv )
 	&ColorStderrSink::ReceiveLogMessage);
 	g3::initializeLogging(worker.get());
 
-	std::string inputFile, outputFile, calibration;
+	fs::path inputFile, outputFile, calibration;
 
 	try {
 		TCLAP::CmdLine cmd("Undistort", ' ', "0.1");
 
-		TCLAP::UnlabeledValueArg<std::string> inputFileArg("inputfile","Input file", true, "", "Input file", cmd);
-		TCLAP::UnlabeledValueArg<std::string> outputFileArg("iuotputfile","Output file", true, "", "Input file", cmd);
+		TCLAP::UnlabeledValueArg<std::string> inputFileArg("input-file","Input file", true, "", "Input file", cmd);
+		TCLAP::UnlabeledValueArg<std::string> outputFileArg("output-file","Output file", true, "", "Input file", cmd);
 
 		TCLAP::ValueArg<std::string> calibrationArg("c","calibration","Calibration file", false, "", "", cmd );
 
@@ -90,17 +90,35 @@ int main( int argc, char** argv )
 
 		inputFile = inputFileArg.getValue();
 		outputFile = outputFileArg.getValue();
-		calibration = calibrationArg.getValue();
+
+		calibration = fs::absolute( calibrationArg.getValue() );
+
+		// Check for existence of calibration file
+		if( !fs::exists(calibration) ) {
+			LOG(FATAL) << "Calibration file \"" << calibration << "\" doesn't exist.";
+		}
 
 	} catch (TCLAP::ArgException &e)  // catch any exceptions
 	{
-		LOG(WARNING) << "error: " << e.error() << " for arg " << e.argId();
-		exit(-1);
+		LOG(FATAL) << "error: " << e.error() << " for arg " << e.argId();
 	}
 
 	// Make undistorter
-	std::shared_ptr<Undistorter> undistorter( new UndistorterPhotoscanXML( calibration ));
+	std::shared_ptr<Undistorter> undistorter( new UndistorterPhotoscanXML( calibration.string() ));
+	if( ! undistorter->isValid() ) {
+		LOG(FATAL) << "Unable to load calibration file \"" << calibration << "\"";
+	}
 
+	cv::Mat input = cv::imread( inputFile.string() );
+
+	if( input.empty() ) {
+		LOG(FATAL) << "Unable to load images file \"" << inputFile << "\"";
+	}
+
+	cv::Mat output;
+	undistorter->undistort( input, output );
+
+	cv::imwrite( outputFile.string(), output );
 
 	exit(0);
 }

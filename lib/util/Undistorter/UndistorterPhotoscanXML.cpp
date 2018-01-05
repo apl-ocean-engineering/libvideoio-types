@@ -43,6 +43,12 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
 
   auto calibrationNode = doc.FirstChildElement( "calibration" );
 
+  if( !calibrationNode ) {
+    LOG(WARNING) << "Unable to find top-level element <\"calibration\"> calibration file " << configFileName;
+    _valid = false;
+    return;
+  }
+
   // TODO, add error checking
   {
     auto widthNode = calibrationNode->FirstChildElement("width");
@@ -99,10 +105,11 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
 
 
   // This distortion elements are optional (no error if not found)
+
+  // TODO: What are Photoscan's b1 and b2 coefficients ... look up in manual?
   {
     auto node = calibrationNode->FirstChildElement("b1");
     if( node ) {
-    // What are b1 and b2?
     //  _b[0] = atof( node->GetText() );
     }
   }
@@ -114,39 +121,41 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
     }
   }
 
-  {
-    auto node = calibrationNode->FirstChildElement("k1");
-    if( node ) {
-      _distCoeffs.at<double>(0,0) = atof( node->GetText() );
-    }
-  }
-
-  {
-    auto node = calibrationNode->FirstChildElement("k2");
-    if( node ) {
-      _distCoeffs.at<double>(0,1) = atof( node->GetText() );
-    }
-  }
-
-  {
-    auto node = calibrationNode->FirstChildElement("p1");
-    if( node ) {
-      _distCoeffs.at<double>(0,2) = atof( node->GetText() );
-    }
-  }
-
-  {
-    auto node = calibrationNode->FirstChildElement("p2");
-    if( node ) {
-      _distCoeffs.at<double>(0,3) = atof( node->GetText() );
-    }
-  }
+  // {
+  //   auto node = calibrationNode->FirstChildElement("k1");
+  //   if( node ) {
+  //     _distCoeffs.at<double>(0,0) = atof( node->GetText() );
+  //   }
+  // }
+  //
+  // {
+  //   auto node = calibrationNode->FirstChildElement("k2");
+  //   if( node ) {
+  //     _distCoeffs.at<double>(0,1) = atof( node->GetText() );
+  //   }
+  // }
+  //
+  // {
+  //   auto node = calibrationNode->FirstChildElement("p1");
+  //   if( node ) {
+  //     _distCoeffs.at<double>(0,2) = atof( node->GetText() );
+  //   }
+  // }
+  //
+  // {
+  //   auto node = calibrationNode->FirstChildElement("p2");
+  //   if( node ) {
+  //     _distCoeffs.at<double>(0,3) = atof( node->GetText() );
+  //   }
+  // }
 
 
 	if (_valid) {
+
 		_K = cv::getOptimalNewCameraMatrix(_originalK, _distCoeffs,
                   cv::Size(_width, _height),
-                  0, cv::Size(_width, _height), nullptr, false);
+                  1,
+                  cv::Size(_width, _height), nullptr, false);
 
 		cv::initUndistortRectifyMap(_originalK, _distCoeffs, cv::Mat(), _K,
 				                cv::Size(_width, _height), CV_16SC2, _map1, _map2);
@@ -158,8 +167,8 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
 		// originalK_.at<double>(1, 2) /= in_height;
 	}
 
-	_originalK = _originalK.t();
-	_K = _K.t();
+	// _originalK = _originalK.t();
+	// _K = _K.t();
 }
 
 UndistorterPhotoscanXML::~UndistorterPhotoscanXML()
