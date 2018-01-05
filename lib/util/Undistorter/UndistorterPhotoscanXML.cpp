@@ -32,6 +32,17 @@ namespace libvideoio
   //   <date>2017-11-14T23:30:12Z</date>
   // </calibration>
 
+template <typename T> bool readFromCalibration<int>( const XMLNode *parent, string name, T &value )
+{
+  auto child = parent->FirstChildElement(name);
+  if( child ) {
+    value = atoi( child->GetText() );
+    return True;
+  }
+
+  return False;
+}
+
 UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileName)
   :   _originalK( cv::Mat(3, 3, CV_64F, cv::Scalar(0)) ),
       _distCoeffs( cv::Mat(1,4, CV_64F, cv::Scalar(0)) ),
@@ -49,15 +60,7 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
     return;
   }
 
-  // TODO, add error checking
-  {
-    auto widthNode = calibrationNode->FirstChildElement("width");
-    if( widthNode ) {
-      _width = atoi( widthNode->GetText() );
-    } else {
-      _valid = false;
-    }
-  }
+  _valid = readFromCalibration<int>(calibrationNode, "width"< _width );
 
   {
     auto heightNode = calibrationNode->FirstChildElement("height");

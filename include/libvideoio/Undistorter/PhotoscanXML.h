@@ -110,6 +110,7 @@ public:
 	bool isValid() const   { return _valid; }
 
 private:
+
 	cv::Mat _K, _originalK;
 	cv::Mat _distCoeffs;
 
