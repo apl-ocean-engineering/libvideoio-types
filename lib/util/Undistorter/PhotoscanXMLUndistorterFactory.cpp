@@ -56,11 +56,14 @@ bool readIntFromCalibration( const XMLNode *parent, std::string name, int &value
   return false;
 }
 
-UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileName)
-  :   _originalK( cv::Mat(3, 3, CV_64F, cv::Scalar(0)) ),
-      _distCoeffs( cv::Mat(1,4, CV_64F, cv::Scalar(0)) ),
-      _valid(true)
+OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromFile(const std::string &configFileName)
+
 {
+
+  cv::Mat originalK( cv::Mat(3, 3, CV_64F, cv::Scalar(0)) );
+  cv::Mat distCoeffs( cv::Mat(1,4, CV_64F, cv::Scalar(0)) );
+  bool valid = true;
+
 
   XMLDocument doc;
   doc.LoadFile( configFileName.c_str() );
@@ -69,25 +72,26 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
 
   if( !topNode ) {
     LOG(WARNING) << "Unable to find top-level element <\"calibration\"> calibration file " << configFileName;
-    _valid = false;
-    return;
+    valid = false;
+    return nullptr;
   }
 
-  _valid = readIntFromCalibration(topNode, "width", _width );
-  _valid = readIntFromCalibration(topNode, "height", _height );
+  int width, height;
+  valid = readIntFromCalibration(topNode, "width", width );
+  valid = readIntFromCalibration(topNode, "height", height );
 
 
   double f=1.0, cx=0.0, cy=0.0;
 
-  _valid = readDoubleFromCalibration(topNode, "f", f);
-  _valid = readDoubleFromCalibration(topNode, "cx", cx);
-  _valid = readDoubleFromCalibration(topNode, "cy", cy);
+  valid = readDoubleFromCalibration(topNode, "f", f);
+  valid = readDoubleFromCalibration(topNode, "cx", cx);
+  valid = readDoubleFromCalibration(topNode, "cy", cy);
 
-	_originalK.at<double>(0, 0) = f;
-	_originalK.at<double>(1, 1) = f;
-	_originalK.at<double>(2, 2) = 1;
-	_originalK.at<double>(0, 2) = cx;
-	_originalK.at<double>(1, 2) = cy;
+	originalK.at<double>(0, 0) = f;
+	originalK.at<double>(1, 1) = f;
+	originalK.at<double>(2, 2) = 1;
+	originalK.at<double>(0, 2) = cx;
+	originalK.at<double>(1, 2) = cy;
 
 
   // This distortion elements are optional (no error if not found)
@@ -112,35 +116,17 @@ UndistorterPhotoscanXML::UndistorterPhotoscanXML(const std::string &configFileNa
 
 
 
-	if (_valid) {
-
-		_K = cv::getOptimalNewCameraMatrix(_originalK, _distCoeffs,
-                  cv::Size(_width, _height),
-                  1,
-                  cv::Size(_width, _height), nullptr, false);
-
-		cv::initUndistortRectifyMap(_originalK, _distCoeffs, cv::Mat(), _K,
-				                cv::Size(_width, _height), CV_16SC2, _map1, _map2);
-
-    //
-		// originalK_.at<double>(0, 0) /= in_width;
-		// originalK_.at<double>(0, 2) /= in_width;
-		// originalK_.at<double>(1, 1) /= in_height;
-		// originalK_.at<double>(1, 2) /= in_height;
+	if (valid) {
+    return new OpenCVUndistorter( originalK, distCoeffs, cv::Size(width,height) );
 	}
 
-	// _originalK = _originalK.t();
+	// originalK = originalK.t();
 	// _K = _K.t();
+
+  return nullptr;
 }
 
-UndistorterPhotoscanXML::~UndistorterPhotoscanXML()
-{
-}
 
-void UndistorterPhotoscanXML::undistort(const cv::Mat& image, cv::OutputArray result) const
-{
-	 cv::remap(image, result, _map1, _map2, cv::INTER_LINEAR);
-}
 
 
 }

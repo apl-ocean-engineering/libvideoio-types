@@ -90,6 +90,102 @@ public:
 	static Undistorter* getUndistorterForFile(const std::string &configFilename);
 };
 
+
+class PhotoscanXMLUndistorterFactory;
+
+
+class OpenCVUndistorter : public Undistorter
+{
+public:
+	virtual ~OpenCVUndistorter();
+
+	/**
+	 * Undistorts the given image and returns the result image.
+	 */
+	virtual void undistort(const cv::Mat &image, cv::OutputArray result) const;
+	virtual void undistortDepth( const cv::Mat &depth, cv::OutputArray result) const { depth.copyTo( result ); }
+
+	/**
+	 * Returns the intrinsic parameter matrix of the undistorted images.
+	 */
+	const cv::Mat getK() const { return _K; }
+
+	virtual const Camera getCamera() const  { return Camera(getK()); }
+
+	/**
+	 * Returns the intrinsic parameter matrix of the original images,
+	 */
+	const cv::Mat getOriginalK() const { return _originalK; }
+
+	/**
+	 * Returns the width of the undistorted images in pixels.
+	 */
+	int getOutputWidth() const  { return _outputSize.width; }
+
+	/**
+	 * Returns the height of the undistorted images in pixels.
+	 */
+	int getOutputHeight() const { return _outputSize.height; }
+
+
+	/**
+	 * Returns the width of the input images in pixels.
+	 */
+	int getInputWidth() const   { return _inputSize.width; }
+
+	/**
+	 * Returns the height of the input images in pixels.
+	 */
+	int getInputHeight() const  { return _inputSize.height; }
+
+	/**
+	 * Returns if the undistorter was initialized successfully.
+	 */
+	bool isValid() const   { return _valid; }
+
+protected:
+
+	friend class PhotoscanXMLUndistorterFactory;
+
+	OpenCVUndistorter( const cv::Mat &k,
+											const cv::Mat &distCoeff,
+											const cv::Size &origSize );
+
+	cv::Mat _K, _originalK;
+	cv::Mat _distCoeffs;
+
+	cv::Size _inputSize, _outputSize;
+
+	// These are standard OpenCV tangential model distortions
+	//float _b[2]
+
+	// float inputCalibration[10];
+	// float outputCalibration;
+	// int out_width, out_height;
+	// int in_width, in_height;
+
+	cv::Mat _map1, _map2;
+
+	/// Is true if the undistorter object is valid (has been initialized with
+	/// a valid configuration)
+	bool _valid;
+
+};
+
+
+class UndistorterFactory {
+};
+
+class PhotoscanXMLUndistorterFactory : public UndistorterFactory {
+public:
+	static OpenCVUndistorter *loadFromFile( const std::string &filename );
+
+private:
+	PhotoscanXMLUndistorterFactory() = delete;
+};
+
+
+
 class UndistorterPTAM : public Undistorter
 {
 public:
@@ -305,5 +401,3 @@ protected:
 };
 
 }
-
-#include "Undistorter/PhotoscanXML.h"

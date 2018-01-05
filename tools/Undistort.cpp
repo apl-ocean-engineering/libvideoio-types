@@ -104,8 +104,8 @@ int main( int argc, char** argv )
 	}
 
 	// Make undistorter
-	std::shared_ptr<Undistorter> undistorter( new UndistorterPhotoscanXML( calibration.string() ));
-	if( ! undistorter->isValid() ) {
+	std::shared_ptr<Undistorter> undistorter( PhotoscanXMLUndistorterFactory::loadFromFile( calibration.string() ));
+	if( !undistorter or !undistorter->isValid() ) {
 		LOG(FATAL) << "Unable to load calibration file \"" << calibration << "\"";
 	}
 
