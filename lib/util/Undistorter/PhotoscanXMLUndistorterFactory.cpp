@@ -71,7 +71,7 @@ OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromFile(const std::strin
   auto topNode = doc.FirstChildElement( "calibration" );
 
   if( !topNode ) {
-    LOG(WARNING) << "Unable to find top-level element <\"calibration\"> calibration file " << configFileName;
+    LOG(WARNING) << "Unable to find top-level element <\"calibration\"> in calibration file " << configFileName;
     valid = false;
     return nullptr;
   }
@@ -117,7 +117,7 @@ OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromFile(const std::strin
 
 
 	if (valid) {
-    return new OpenCVUndistorter( originalK, distCoeffs, cv::Size(width,height) );
+    return new OpenCVUndistorter( originalK, distCoeffs, ImageSize(width,height) );
 	}
 
 	// originalK = originalK.t();

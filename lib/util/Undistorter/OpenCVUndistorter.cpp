@@ -14,7 +14,7 @@ namespace libvideoio
 
   OpenCVUndistorter::OpenCVUndistorter( const cv::Mat &k,
 											const cv::Mat &distCoeff,
-											const cv::Size &origSize )
+											const ImageSize &origSize )
     : _originalK( k ),
       _distCoeffs( distCoeff ),
       _inputSize( origSize ),
@@ -23,12 +23,12 @@ namespace libvideoio
 {
 
   _K = cv::getOptimalNewCameraMatrix(_originalK, _distCoeffs,
-                _inputSize,
+                _inputSize(),
                 1,
-                _outputSize, nullptr, false);
+                _outputSize(), nullptr, false);
 
   cv::initUndistortRectifyMap(_originalK, _distCoeffs, cv::Mat(), _K,
-                      _outputSize, CV_16SC2, _map1, _map2);
+                      _outputSize(), CV_16SC2, _map1, _map2);
 
   //
   // originalK_.at<double>(0, 0) /= in_width;

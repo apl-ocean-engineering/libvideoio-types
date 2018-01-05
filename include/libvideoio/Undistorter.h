@@ -30,7 +30,7 @@ namespace libvideoio {
 class Undistorter
 {
 public:
-	virtual ~Undistorter();
+	virtual ~Undistorter() {}
 
 	/**
 	 * Undistorts the given image and returns the result image.
@@ -44,38 +44,36 @@ public:
 	 */
 	virtual const cv::Mat getK() const = 0;
 
-	virtual const Camera getCamera() const = 0;
+	virtual const Camera getCamera() const  { return Camera(getK()); }
 
 	/**
 	 * Returns the intrinsic parameter matrix of the original images,
 	 */
 	virtual const cv::Mat getOriginalK() const = 0;
 
-	virtual ImageSize outputImageSize( void ) const
-		{ return ImageSize( getOutputWidth(), getOutputHeight() ); }
+	virtual ImageSize outputImageSize( void ) const { return inputImageSize(); };
 
 	/**
 	 * Returns the width of the undistorted images in pixels.
 	 */
-	virtual int getOutputWidth() const = 0;
+	virtual int getOutputWidth() const { return outputImageSize().width; };
 
 	/**
 	 * Returns the height of the undistorted images in pixels.
 	 */
-	virtual int getOutputHeight() const = 0;
+	virtual int getOutputHeight() const { return outputImageSize().height; };
 
-	virtual ImageSize inputImageSize( void ) const
-		{ return ImageSize( getInputWidth(), getInputHeight() ); }
+	virtual ImageSize inputImageSize( void ) const = 0;
 
 	/**
 	 * Returns the width of the input images in pixels.
 	 */
-	virtual int getInputWidth() const = 0;
+	virtual int getInputWidth() const { return inputImageSize().width; };
 
 	/**
 	 * Returns the height of the input images in pixels.
 	 */
-	virtual int getInputHeight() const = 0;
+	virtual int getInputHeight() const { return inputImageSize().height; };
 
 
 	/**
@@ -83,11 +81,6 @@ public:
 	 */
 	virtual bool isValid() const = 0;
 
-	/**
-	 * Creates and returns an Undistorter of the type used by the given
-	 * configuration file. If the format is not recognized, returns nullptr.
-	 */
-	static Undistorter* getUndistorterForFile(const std::string &configFilename);
 };
 
 
@@ -110,8 +103,6 @@ public:
 	 */
 	const cv::Mat getK() const { return _K; }
 
-	virtual const Camera getCamera() const  { return Camera(getK()); }
-
 	/**
 	 * Returns the intrinsic parameter matrix of the original images,
 	 */
@@ -120,23 +111,10 @@ public:
 	/**
 	 * Returns the width of the undistorted images in pixels.
 	 */
-	int getOutputWidth() const  { return _outputSize.width; }
+	virtual ImageSize inputImageSize() const  { return _inputSize; }
 
-	/**
-	 * Returns the height of the undistorted images in pixels.
-	 */
-	int getOutputHeight() const { return _outputSize.height; }
+	virtual ImageSize outputImageSize() const  { return _outputSize; }
 
-
-	/**
-	 * Returns the width of the input images in pixels.
-	 */
-	int getInputWidth() const   { return _inputSize.width; }
-
-	/**
-	 * Returns the height of the input images in pixels.
-	 */
-	int getInputHeight() const  { return _inputSize.height; }
 
 	/**
 	 * Returns if the undistorter was initialized successfully.
@@ -149,20 +127,15 @@ protected:
 
 	OpenCVUndistorter( const cv::Mat &k,
 											const cv::Mat &distCoeff,
-											const cv::Size &origSize );
+											const ImageSize &origSize );
 
 	cv::Mat _K, _originalK;
 	cv::Mat _distCoeffs;
 
-	cv::Size _inputSize, _outputSize;
+	ImageSize _inputSize, _outputSize;
 
 	// These are standard OpenCV tangential model distortions
 	//float _b[2]
-
-	// float inputCalibration[10];
-	// float outputCalibration;
-	// int out_width, out_height;
-	// int in_width, in_height;
 
 	cv::Mat _map1, _map2;
 
@@ -174,6 +147,13 @@ protected:
 
 
 class UndistorterFactory {
+public:
+	/**
+	 * Creates and returns an Undistorter of the type used by the given
+	 * configuration file. If the format is not recognized, returns nullptr.
+	 */
+	static Undistorter* getUndistorterForFile(const std::string &configFilename);
+
 };
 
 class PhotoscanXMLUndistorterFactory : public UndistorterFactory {
@@ -184,220 +164,220 @@ private:
 	PhotoscanXMLUndistorterFactory() = delete;
 };
 
-
-
-class UndistorterPTAM : public Undistorter
-{
-public:
-	/**
-	 * Creates an Undistorter by reading the distortion parameters from a file.
-	 *
-	 * The file format is as follows:
-	 * d1 d2 d3 d4 d5
-	 * inputWidth inputHeight
-	 * crop / full / none
-	 * outputWidth outputHeight
-	 */
-	UndistorterPTAM(const char* configFileName);
-
-	/**
-	 * Destructor.
-	 */
-	~UndistorterPTAM();
-
-	UndistorterPTAM(const UndistorterPTAM&) = delete;
-	UndistorterPTAM& operator=(const UndistorterPTAM&) = delete;
-
-	/**
-	 * Undistorts the given image and returns the result image.
-	 */
-	void undistort(const cv::Mat &image, cv::OutputArray result) const;
-
-	/**
-	 * Returns the intrinsic parameter matrix of the undistorted images.
-	 */
-	const cv::Mat getK() const;
-
-	virtual const Camera getCamera() const;
-
-
-	/**
-	 * Returns the intrinsic parameter matrix of the original images,
-	 */
-	const cv::Mat getOriginalK() const;
-
-	/**
-	 * Returns the width of the undistorted images in pixels.
-	 */
-	int getOutputWidth() const;
-
-	/**
-	 * Returns the height of the undistorted images in pixels.
-	 */
-	int getOutputHeight() const;
-
-	/**
-	 * Returns the width of the input images in pixels.
-	 */
-	int getInputWidth() const;
-
-	/**
-	 * Returns the height of the input images in pixels.
-	 */
-	int getInputHeight() const;
-
-
-	/**
-	 * Returns if the undistorter was initialized successfully.
-	 */
-	bool isValid() const;
-
-private:
-	cv::Mat K_;
-	cv::Mat originalK_;
-
-	float inputCalibration[5];
-	float outputCalibration[5];
-	int out_width, out_height;
-	int in_width, in_height;
-	float* remapX;
-	float* remapY;
-
-
-	/// Is true if the undistorter object is valid (has been initialized with
-	/// a valid configuration)
-	bool valid;
-};
-
-class UndistorterOpenCV : public Undistorter
-{
-public:
-	/**
-	 * Creates an Undistorter by reading the distortion parameters from a file.
-	 *
-	 * The file format is as follows:
-	 * fx fy cx cy d1 d2 d3 d4 d5 d6
-	 * inputWidth inputHeight
-	 * crop / full / none
-	 * outputWidth outputHeight
-	 */
-	UndistorterOpenCV(const char* configFileName);
-
-	/**
-	 * Destructor.
-	 */
-	~UndistorterOpenCV();
-
-	UndistorterOpenCV(const UndistorterOpenCV&) = delete;
-	UndistorterOpenCV& operator=(const UndistorterOpenCV&) = delete;
-
-	/**
-	 * Undistorts the given image and returns the result image.
-	 */
-	void undistort(const cv::Mat &image, cv::OutputArray result) const;
-
-	/**
-	 * Returns the intrinsic parameter matrix of the undistorted images.
-	 */
-	const cv::Mat getK() const;
-
-	virtual const Camera getCamera() const;
-
-	/**
-	 * Returns the intrinsic parameter matrix of the original images,
-	 */
-	const cv::Mat getOriginalK() const;
-
-	/**
-	 * Returns the width of the undistorted images in pixels.
-	 */
-	int getOutputWidth() const;
-
-	/**
-	 * Returns the height of the undistorted images in pixels.
-	 */
-	int getOutputHeight() const;
-
-
-	/**
-	 * Returns the width of the input images in pixels.
-	 */
-	int getInputWidth() const;
-
-	/**
-	 * Returns the height of the input images in pixels.
-	 */
-	int getInputHeight() const;
-
-	/**
-	 * Returns if the undistorter was initialized successfully.
-	 */
-	bool isValid() const;
-
-private:
-	cv::Mat K_;
-	cv::Mat originalK_;
-
-	float inputCalibration[10];
-	float outputCalibration;
-	int out_width, out_height;
-	int in_width, in_height;
-	cv::Mat map1, map2;
-
-	/// Is true if the undistorter object is valid (has been initialized with
-	/// a valid configuration)
-	bool valid;
-};
-
-
-class UndistorterLogger : public Undistorter
-{
-public:
-	/**
-	 * Creates an Undistorter by reading the distortion parameters from a file.
-	 *
-	 * The file format is as follows:
-	 * fx fy cx cy
-	 * inputWidth inputHeight
-	 * cropWidth cropHeight
-	 * outputWidth outputHeight
-	 */
-	UndistorterLogger(const char* configFileName);
-
-	/**
-	 * Destructor.
-	 */
-	~UndistorterLogger();
-
-	UndistorterLogger(const UndistorterLogger&) = delete;
-	UndistorterLogger& operator=(const UndistorterLogger&) = delete;
-
-	void undistort(const cv::Mat &image, cv::OutputArray result) const;
-	virtual void undistortDepth( const cv::Mat &depth, cv::OutputArray result) const;
-
-
-	const cv::Mat getK() const;
-	virtual const Camera getCamera() const;
-	virtual const Camera getOriginalCamera( void ) const { return _originalCamera; }
-
-
-	const cv::Mat getOriginalK() const;
-	int getOutputWidth() const						{ return _finalSize.width; }
-	int getOutputHeight() const						{ return _finalSize.height; }
-	int getInputWidth() const							{ return _inputSize.width; }
-	int getInputHeight() const						{ return _inputSize.height; }
-
-
-	bool isValid() const { return _valid; }
-
-protected:
-
-	UndistorterLogger( const ImageSize &inputSize, const Camera &cam  );
-
-	ImageSize _inputSize, _cropSize, _finalSize;
-	Camera _originalCamera;
-
-	bool _valid;
-};
+//
+//
+// class UndistorterPTAM : public Undistorter
+// {
+// public:
+// 	/**
+// 	 * Creates an Undistorter by reading the distortion parameters from a file.
+// 	 *
+// 	 * The file format is as follows:
+// 	 * d1 d2 d3 d4 d5
+// 	 * inputWidth inputHeight
+// 	 * crop / full / none
+// 	 * outputWidth outputHeight
+// 	 */
+// 	UndistorterPTAM(const char* configFileName);
+//
+// 	/**
+// 	 * Destructor.
+// 	 */
+// 	~UndistorterPTAM();
+//
+// 	UndistorterPTAM(const UndistorterPTAM&) = delete;
+// 	UndistorterPTAM& operator=(const UndistorterPTAM&) = delete;
+//
+// 	/**
+// 	 * Undistorts the given image and returns the result image.
+// 	 */
+// 	void undistort(const cv::Mat &image, cv::OutputArray result) const;
+//
+// 	/**
+// 	 * Returns the intrinsic parameter matrix of the undistorted images.
+// 	 */
+// 	const cv::Mat getK() const;
+//
+// 	virtual const Camera getCamera() const;
+//
+//
+// 	/**
+// 	 * Returns the intrinsic parameter matrix of the original images,
+// 	 */
+// 	const cv::Mat getOriginalK() const;
+//
+// 	/**
+// 	 * Returns the width of the undistorted images in pixels.
+// 	 */
+// 	int getOutputWidth() const;
+//
+// 	/**
+// 	 * Returns the height of the undistorted images in pixels.
+// 	 */
+// 	int getOutputHeight() const;
+//
+// 	/**
+// 	 * Returns the width of the input images in pixels.
+// 	 */
+// 	int getInputWidth() const;
+//
+// 	/**
+// 	 * Returns the height of the input images in pixels.
+// 	 */
+// 	int getInputHeight() const;
+//
+//
+// 	/**
+// 	 * Returns if the undistorter was initialized successfully.
+// 	 */
+// 	bool isValid() const;
+//
+// private:
+// 	cv::Mat K_;
+// 	cv::Mat originalK_;
+//
+// 	float inputCalibration[5];
+// 	float outputCalibration[5];
+// 	int out_width, out_height;
+// 	int in_width, in_height;
+// 	float* remapX;
+// 	float* remapY;
+//
+//
+// 	/// Is true if the undistorter object is valid (has been initialized with
+// 	/// a valid configuration)
+// 	bool valid;
+// };
+//
+// class UndistorterOpenCV : public Undistorter
+// {
+// public:
+// 	/**
+// 	 * Creates an Undistorter by reading the distortion parameters from a file.
+// 	 *
+// 	 * The file format is as follows:
+// 	 * fx fy cx cy d1 d2 d3 d4 d5 d6
+// 	 * inputWidth inputHeight
+// 	 * crop / full / none
+// 	 * outputWidth outputHeight
+// 	 */
+// 	UndistorterOpenCV(const char* configFileName);
+//
+// 	/**
+// 	 * Destructor.
+// 	 */
+// 	~UndistorterOpenCV();
+//
+// 	UndistorterOpenCV(const UndistorterOpenCV&) = delete;
+// 	UndistorterOpenCV& operator=(const UndistorterOpenCV&) = delete;
+//
+// 	/**
+// 	 * Undistorts the given image and returns the result image.
+// 	 */
+// 	void undistort(const cv::Mat &image, cv::OutputArray result) const;
+//
+// 	/**
+// 	 * Returns the intrinsic parameter matrix of the undistorted images.
+// 	 */
+// 	const cv::Mat getK() const;
+//
+// 	virtual const Camera getCamera() const;
+//
+// 	/**
+// 	 * Returns the intrinsic parameter matrix of the original images,
+// 	 */
+// 	const cv::Mat getOriginalK() const;
+//
+// 	/**
+// 	 * Returns the width of the undistorted images in pixels.
+// 	 */
+// 	int getOutputWidth() const;
+//
+// 	/**
+// 	 * Returns the height of the undistorted images in pixels.
+// 	 */
+// 	int getOutputHeight() const;
+//
+//
+// 	/**
+// 	 * Returns the width of the input images in pixels.
+// 	 */
+// 	int getInputWidth() const;
+//
+// 	/**
+// 	 * Returns the height of the input images in pixels.
+// 	 */
+// 	int getInputHeight() const;
+//
+// 	/**
+// 	 * Returns if the undistorter was initialized successfully.
+// 	 */
+// 	bool isValid() const;
+//
+// private:
+// 	cv::Mat K_;
+// 	cv::Mat originalK_;
+//
+// 	float inputCalibration[10];
+// 	float outputCalibration;
+// 	int out_width, out_height;
+// 	int in_width, in_height;
+// 	cv::Mat map1, map2;
+//
+// 	/// Is true if the undistorter object is valid (has been initialized with
+// 	/// a valid configuration)
+// 	bool valid;
+// };
+//
+//
+// class UndistorterLogger : public Undistorter
+// {
+// public:
+// 	/**
+// 	 * Creates an Undistorter by reading the distortion parameters from a file.
+// 	 *
+// 	 * The file format is as follows:
+// 	 * fx fy cx cy
+// 	 * inputWidth inputHeight
+// 	 * cropWidth cropHeight
+// 	 * outputWidth outputHeight
+// 	 */
+// 	UndistorterLogger(const char* configFileName);
+//
+// 	/**
+// 	 * Destructor.
+// 	 */
+// 	~UndistorterLogger();
+//
+// 	UndistorterLogger(const UndistorterLogger&) = delete;
+// 	UndistorterLogger& operator=(const UndistorterLogger&) = delete;
+//
+// 	void undistort(const cv::Mat &image, cv::OutputArray result) const;
+// 	virtual void undistortDepth( const cv::Mat &depth, cv::OutputArray result) const;
+//
+//
+// 	const cv::Mat getK() const;
+// 	virtual const Camera getCamera() const;
+// 	virtual const Camera getOriginalCamera( void ) const { return _originalCamera; }
+//
+//
+// 	const cv::Mat getOriginalK() const;
+// 	int getOutputWidth() const						{ return _finalSize.width; }
+// 	int getOutputHeight() const						{ return _finalSize.height; }
+// 	int getInputWidth() const							{ return _inputSize.width; }
+// 	int getInputHeight() const						{ return _inputSize.height; }
+//
+//
+// 	bool isValid() const { return _valid; }
+//
+// protected:
+//
+// 	UndistorterLogger( const ImageSize &inputSize, const Camera &cam  );
+//
+// 	ImageSize _inputSize, _cropSize, _finalSize;
+// 	Camera _originalCamera;
+//
+// 	bool _valid;
+// };
 
 }
