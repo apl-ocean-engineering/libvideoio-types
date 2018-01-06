@@ -96,13 +96,8 @@ public:
 	 */
 	const cv::Mat getOriginalK() const { return _originalK; }
 
-	/**
-	 * Returns the width of the undistorted images in pixels.
-	 */
 	virtual ImageSize inputImageSize() const  { return _inputSize; }
-
 	virtual ImageSize outputImageSize() const  { return _outputSize; }
-
 
 	/**
 	 * Returns if the undistorter was initialized successfully.
@@ -115,13 +110,9 @@ protected:
 	cv::Mat _distCoeffs;
 
 	ImageSize _inputSize, _outputSize;
-
-	// These are standard OpenCV tangential model distortions
-	//float _b[2]
-
 	cv::Mat _map1, _map2;
 
-	/// Is true if the undistorter object is valid (has been initialized with
+	/// true if the undistorter object is valid (has been initialized with
 	/// a valid configuration)
 	bool _valid;
 

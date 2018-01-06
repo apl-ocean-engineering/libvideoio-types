@@ -10,7 +10,6 @@ namespace fs = boost::filesystem;
 
 #include <tclap/CmdLine.h>
 
-
 #include "libvideoio/G3LogSinks.h"
 
 
@@ -43,7 +42,7 @@ int main( int argc, char** argv )
 {
 	auto worker = g3::LogWorker::createLogWorker();
 	auto stderrHandle = worker->addSink(std::unique_ptr<ColorStderrSink>( new ColorStderrSink ),
-	&ColorStderrSink::ReceiveLogMessage);
+												&ColorStderrSink::ReceiveLogMessage);
 	g3::initializeLogging(worker.get());
 
 	fs::path inputFile, outputFile, calibration;

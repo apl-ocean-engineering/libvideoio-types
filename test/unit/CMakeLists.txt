@@ -5,9 +5,12 @@ file( GLOB UNIT_TEST_SRCS *_test.cpp )
 # set( TEST_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../data" )
 # add_definitions( -DTEST_DATA_DIR=${TEST_DATA_DIR} )
 
-gtest_begin(videoio)
+# NO_TEMPLATE means  "I wrote my own main()"
+
+gtest_begin(videoio NO_TEMPLATE)
     fips_files(
-            ${UNIT_TEST_SRCS}
+      ${UNIT_TEST_SRCS}
+      main.cpp
     )
     fips_deps(videoio)
 

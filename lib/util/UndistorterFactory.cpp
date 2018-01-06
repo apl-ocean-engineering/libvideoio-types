@@ -28,7 +28,7 @@ namespace libvideoio
 
 Undistorter* UndistorterFactory::getUndistorterForFile(const std::string &configFilename)
 {
-	LOG(INFO) << "Reading Calibration from file " << configFilename;
+	LOG(INFO) << "Attempting to determine type calibration from file " << configFilename;
 
 	std::ifstream f(configFilename.c_str());
 	if (!f.good())
@@ -53,29 +53,30 @@ Undistorter* UndistorterFactory::getUndistorterForFile(const std::string &config
 
 		return OpenCVUndistorterFactory::loadFromFile(configFilename);
 	}
+	else if(std::sscanf(l1.c_str(), "%f %f %f %f %f",
+				&ic[0], &ic[1], &ic[2], &ic[3], &ic[4]) == 5)
+	{
+		LOG(INFO) << "found PTAM camera model, building rectifier.";
+    //
+		// Undistorter* u = new UndistorterPTAM(configFilename.c_str());
+		// if(!u->isValid()) return 0;
+		// return u;
+	}
+	else if(std::sscanf(l1.c_str(), "%f %f %f %f",
+				&ic[0], &ic[1], &ic[2], &ic[3]) == 4)
+	{
+		LOG(INFO) << "Found Logger camera model, building rectifier.";
+		// Undistorter* u = new UndistorterLogger(configFilename.c_str());
+		// if(!u->isValid()) return 0;
+		// return u;
+	} else	{
+		LOG(INFO) << "Found ATAN camera model, building rectifier.";
+		// Undistorter* u = new UndistorterPTAM(configFilename.c_str());
+		// if(!u->isValid()) return 0;
+		// return u;
+	}
 
-	// else if(std::sscanf(l1.c_str(), "%f %f %f %f %f",
-	// 			&ic[0], &ic[1], &ic[2], &ic[3], &ic[4]) == 5)
-	// {
-	// 	LOG(INFO) << "found PTAM camera model, building rectifier.";
-	// 	Undistorter* u = new UndistorterPTAM(configFilename.c_str());
-	// 	if(!u->isValid()) return 0;
-	// 	return u;
-	// }
-	// else if(std::sscanf(l1.c_str(), "%f %f %f %f",
-	// 			&ic[0], &ic[1], &ic[2], &ic[3]) == 4)
-	// {
-	// 	LOG(INFO) << "Found Logger camera model, building rectifier.";
-	// 	Undistorter* u = new UndistorterLogger(configFilename.c_str());
-	// 	if(!u->isValid()) return 0;
-	// 	return u;
-	// } else	{
-	// 	LOG(INFO) << "Found ATAN camera model, building rectifier.";
-	// 	Undistorter* u = new UndistorterPTAM(configFilename.c_str());
-	// 	if(!u->isValid()) return 0;
-	// 	return u;
-	// }
-
+	LOG(INFO) << "Unable to figure out calibration file type, giving up";
 	return nullptr;
 }
 
