@@ -135,7 +135,10 @@ public:
 	static OpenCVUndistorter *loadFromFile( const std::string &filename );
 };
 
-
+class PTAMUndistorterFactory : public UndistorterFactory {
+public:
+	static OpenCVUndistorter *loadFromFile( const std::string &filename );
+};
 
 class OpenCVUndistorterFactory : public UndistorterFactory {
 public:
