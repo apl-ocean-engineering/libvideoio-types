@@ -1,5 +1,5 @@
 # wercker version for box creation
-box: amarburg/lsdslam-dev-host:conan-latest
+box: amarburg/lsdslam-dev-host:latest
 
 build:
   steps:
