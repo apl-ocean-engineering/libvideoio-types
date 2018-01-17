@@ -2,7 +2,11 @@
 // #include <string>
 // using namespace std;
 
-#include <opencv2/imgcodecs.hpp>
+#ifdef OPENCV3
+	#include <opencv2/imgcodecs.hpp>
+#else
+	#include <opencv2/highgui/highgui.hpp>
+#endif
 
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include <boost/filesystem.hpp>
