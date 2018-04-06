@@ -1,6 +1,7 @@
 # Set source files
 file(GLOB VIDEOIO_SOURCE_FILES *.cpp
-        util/*.cpp )
+        util/*.cpp
+        undistorter/*.cpp )
 
 # build shared library.
 fips_begin_module( videoio )

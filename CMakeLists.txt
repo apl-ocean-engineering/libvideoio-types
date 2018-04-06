@@ -73,6 +73,7 @@ if( NOT FIPS_IMPORT )
 	fips_add_subdirectory("tools/")
 
 	if( FIPS_UNITTESTS )
+		message("** Will run unit tests")
 	  fips_add_subdirectory( test/unit/ )
 	endif()
 

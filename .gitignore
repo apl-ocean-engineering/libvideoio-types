@@ -29,6 +29,11 @@ build-*/
 *.exe
 *.out
 *.app
+
 .fips-*
+
 .AppleDouble/
 .wercker/
+
+.DS_Store
+._.DS_Store

@@ -33,12 +33,31 @@ namespace libvideoio
   // </calibration>
 
   // From the Photoscan Manual:
+  // (X,Y,Z) == point coords in local camera coord system
+  //
+  // x = X / Z
+  // y = Y / Z
+  //
   // x' = x(1 + K1r^2 + K2r^4 + K3r^6 + K4r^8 ) + (P1(r +2x ) + 2P2xy)(1 + P3r + P4r )
   // y' = y(1 + K1r^2 + K2r^4 + K3r^6 + K4r^8 ) + (P2(r +2y ) + 2P1xy)(1 + P3r + P4r )
+  //
   // u = w * 0.5 + cx + x'f + x'B1 + y'B2
   // v = h * 0.5 + cy + y'f
+  // (u,v) point coord in image coord system (in pixels)
   //
   // Interestingly, they seem to reverse p1 and p2 relative to OpenCV
+
+  // For reference, OpenCV does:
+  //
+  // x = X / W
+  // y = Y / W
+  //
+  // x' = x'(1 + K1r^2 + K2r^4 + K3r^6 )/(1 + K4r^2 + K5r^4 + K6r^6) + 2p1x'y' + p2(r^2 + 2x'^2) + s1r^4 + s2r^4
+  // y' = y'(1 + K1r^2 + K2r^4 + K3r^6 )/(1 + K4r^2 + K5r^4 + K6r^6) + p1(r^2 + 2y'^2) + 2p2x'y' + s3r^2 + s4r^4
+  //
+  // u = x'fx + c_x
+  // v = y'fy + c_y
+
 
   bool readDoubleFromXML( const XMLNode *parent, std::string name, double &value, double def = 0.0 )
   {
