@@ -1,0 +1,6 @@
+pipeline:
+  build:
+    image: amarburg/lsdslam-dev-host:latest
+    commands:
+          - ./fips set config linux-make-unittest
+          - ./fips build
