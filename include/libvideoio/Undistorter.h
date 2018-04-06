@@ -22,8 +22,12 @@
 
 #include <opencv2/core/core.hpp>
 
+#include "nlohmann/json.hpp"
+
 #include "Camera.h"
 #include "ImageSize.h"
+
+#include <tinyxml2.h>
 
 namespace libvideoio {
 
@@ -130,14 +134,17 @@ public:
 
 };
 
+// Each of these input files can be mapped to the OpenCV distortion model
 class PhotoscanXMLUndistorterFactory : public UndistorterFactory {
 public:
 	static OpenCVUndistorter *loadFromFile( const std::string &filename );
+	static OpenCVUndistorter *loadFromXML( tinyxml2::XMLDocument &doc, const std::string&filename = "" );
 };
 
 class PTAMUndistorterFactory : public UndistorterFactory {
 public:
 	static OpenCVUndistorter *loadFromFile( const std::string &filename );
+	static OpenCVUndistorter *loadFromJSON( const nlohmann::json &json );
 };
 
 class OpenCVUndistorterFactory : public UndistorterFactory {

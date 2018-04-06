@@ -27,7 +27,8 @@ elseif( ${ARCHITECTURE} STREQUAL "x86_64" )
 endif()
 
 ## C++ flags applied to all builds
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+## squelch int-in-bool-context warnings from eigen
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-int-in-bool-context")
 
 ## Configure OpenCV ##
 set( OPENCV_COMPONENTS core highgui imgproc video calib3d )
@@ -59,6 +60,7 @@ endif()
 ## Set global include paths
 set( VIDEOIO_INCLUDE_DIRS
 	${CMAKE_CURRENT_SOURCE_DIR}/include
+	${CMAKE_CURRENT_SOURCE_DIR}/third_party
   ${OpenCV_INCLUDE_DIRS}
 	${TINYXML2_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR} )

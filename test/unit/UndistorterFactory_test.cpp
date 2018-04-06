@@ -11,16 +11,23 @@ using namespace std;
 
 namespace {
 
-TEST( UndistorterFactory, LoadCameraCalibration ) {
+TEST( UndistorterFactory, LoadPTAMJSON ) {
 
-  std::shared_ptr<Undistorter> undistorter( UndistorterFactory::getUndistorterForFile( CAMERA_CALIBRATION_CFG ) );
+  std::shared_ptr<Undistorter> undistorter( UndistorterFactory::getUndistorterForFile( PTAM_JSON ) );
 
   ASSERT_TRUE( (bool)undistorter );
 
+  // cout << "Original K:" << endl << undistorter->getOriginalK() << endl;
+  // cout << "Processed K:" << endl << undistorter->getK() << endl;
+}
 
-  cout << "Original K:" << endl << undistorter->getOriginalK() << endl;
+TEST( UndistorterFactory, LoadPhotoscanXML ) {
 
-  cout << "Processed K:" << endl << undistorter->getK() << endl;
+  std::shared_ptr<Undistorter> undistorter( UndistorterFactory::getUndistorterForFile( PHOTOSCAN_XML ) );
+  ASSERT_TRUE( (bool)undistorter );
+
+  // cout << "Original K:" << endl << undistorter->getOriginalK() << endl;
+  // cout << "Processed K:" << endl << undistorter->getK() << endl;
 }
 
 }

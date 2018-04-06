@@ -84,13 +84,16 @@ namespace libvideoio
   }
 
   OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromFile(const std::string &configFileName)
-
   {
-    bool valid = true;
-
     XMLDocument doc;
     doc.LoadFile( configFileName.c_str() );
 
+    return loadFromXML( doc, configFileName );
+  }
+
+  OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromXML( XMLDocument &doc, const std::string &configFileName )
+  {
+    bool valid = true;
     auto topNode = doc.FirstChildElement( "calibration" );
 
     if( !topNode ) {

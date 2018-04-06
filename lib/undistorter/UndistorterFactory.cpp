@@ -20,61 +20,89 @@
 
 #include "libvideoio/Undistorter.h"
 
+#include "nlohmann/json.hpp"
+#include <tinyxml2.h>
+
 #include <fstream>
 
 namespace libvideoio
 {
 
 
-Undistorter* UndistorterFactory::getUndistorterForFile(const std::string &configFilename)
+Undistorter* UndistorterFactory::getUndistorterForFile(const std::string &configFileName)
 {
-	LOG(INFO) << "Attempting to determine type calibration from file " << configFilename;
+	LOG(INFO) << "Attempting to determine type calibration from file ..." << configFileName;
 
-	std::ifstream f(configFilename.c_str());
-	if (!f.good())
-	{
-		LOG(FATAL) << " ... not found. Cannot operate without calibration, shutting down.";
-		f.close();
-		return NULL;
+	std::ifstream f(configFileName);
+
+	try {
+		// Try to parse it as JSON
+		nlohmann::json j;
+		f >> j;
+
+		if( j.count("calib_type") > 0 ) {
+			LOG(INFO) << "   ... believe file is PTAM JSON format";
+			return PTAMUndistorterFactory::loadFromJSON(j);
+		}
+	} catch( nlohmann::json::parse_error e ) {
+		LOG(INFO) << "Error parsing JSON: " << e.what();
 	}
 
-	std::string l1;
-	std::getline(f,l1);
-	f.close();
+	tinyxml2::XMLDocument doc;
+	doc.LoadFile( configFileName.c_str() );
+	auto topNode = doc.FirstChildElement( "calibration" );
 
-
-
-	float ic[10];
-	if(std::sscanf(l1.c_str(), "%f %f %f %f %f %f %f %f",
-			&ic[0], &ic[1], &ic[2], &ic[3], &ic[4],
-			&ic[5], &ic[6], &ic[7]) == 8)
-	{
-		LOG(INFO) << "found OpenCV camera model, building rectifier.";
-
-		return OpenCVUndistorterFactory::loadFromFile(configFilename);
+	if( topNode ) {
+		LOG(INFO) << "   ... believe file is Photoscan XML format";
+		return PhotoscanXMLUndistorterFactory::loadFromXML( doc, configFileName );
 	}
-	else if(std::sscanf(l1.c_str(), "%f %f %f %f %f",
-				&ic[0], &ic[1], &ic[2], &ic[3], &ic[4]) == 5)
-	{
-		LOG(INFO) << "found PTAM camera model, building rectifier.";
-    //
-		// Undistorter* u = new UndistorterPTAM(configFilename.c_str());
-		// if(!u->isValid()) return 0;
-		// return u;
-	}
-	else if(std::sscanf(l1.c_str(), "%f %f %f %f",
-				&ic[0], &ic[1], &ic[2], &ic[3]) == 4)
-	{
-		LOG(INFO) << "Found Logger camera model, building rectifier.";
-		// Undistorter* u = new UndistorterLogger(configFilename.c_str());
-		// if(!u->isValid()) return 0;
-		// return u;
-	} else	{
-		LOG(INFO) << "Found ATAN camera model, building rectifier.";
-		// Undistorter* u = new UndistorterPTAM(configFilename.c_str());
-		// if(!u->isValid()) return 0;
-		// return u;
-	}
+
+
+
+	// if (!f.good())
+	// {
+	// 	LOG(FATAL) << " ... not found. Cannot operate without calibration, shutting down.";
+	// 	f.close();
+	// 	return NULL;
+	// }
+	//
+	// std::string l1;
+	// std::getline(f,l1);
+	// f.close();
+	//
+	//
+	//
+	// float ic[10];
+	// if(std::sscanf(l1.c_str(), "%f %f %f %f %f %f %f %f",
+	// 		&ic[0], &ic[1], &ic[2], &ic[3], &ic[4],
+	// 		&ic[5], &ic[6], &ic[7]) == 8)
+	// {
+	// 	LOG(INFO) << "found OpenCV camera model, building rectifier.";
+	//
+	// 	return OpenCVUndistorterFactory::loadFromFile(configFileName);
+	// }
+	// else if(std::sscanf(l1.c_str(), "%f %f %f %f %f",
+	// 			&ic[0], &ic[1], &ic[2], &ic[3], &ic[4]) == 5)
+	// {
+	// 	LOG(INFO) << "found PTAM camera model, building rectifier.";
+  //   //
+	// 	// Undistorter* u = new UndistorterPTAM(configFileName.c_str());
+	// 	// if(!u->isValid()) return 0;
+	// 	// return u;
+	// }
+	// else if(std::sscanf(l1.c_str(), "%f %f %f %f",
+	// 			&ic[0], &ic[1], &ic[2], &ic[3]) == 4)
+	// {
+	// 	LOG(INFO) << "Found Logger camera model, building rectifier.";
+	// 	// Undistorter* u = new UndistorterLogger(configFileName.c_str());
+	// 	// if(!u->isValid()) return 0;
+	// 	// return u;
+	// } else	{
+	// 	LOG(INFO) << "Found ATAN camera model, building rectifier.";
+	// 	// Undistorter* u = new UndistorterPTAM(configFileName.c_str());
+	// 	// if(!u->isValid()) return 0;
+	// 	// return u;
+	// }
 
 	LOG(INFO) << "Unable to figure out calibration file type, giving up";
 	return nullptr;
