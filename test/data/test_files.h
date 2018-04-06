@@ -6,4 +6,6 @@
 #endif
 
 #define PHOTOSCAN_XML (TEST_DATA_DIR"/Photoscan_d2_camera.xml")
+
 #define PTAM_JSON (TEST_DATA_DIR"/PTAM_calibration.json")
+#define PTAM_LEGACY (TEST_DATA_DIR"/PTAM_calibration.txt")
