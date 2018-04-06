@@ -2,5 +2,6 @@ pipeline:
   build:
     image: amarburg/lsdslam-dev-host:latest
     commands:
+          - apt-get install ca-certificates
           - ./fips set config linux-make-unittest
           - ./fips build
