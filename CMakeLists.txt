@@ -64,7 +64,7 @@ set( VIDEOIO_INCLUDE_DIRS
   ${OpenCV_INCLUDE_DIRS}
 	${TINYXML2_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR} )
-include_directories( ${VIDEOIO_INCLUDE_DIRS} )
+fips_include_directories( ${VIDEOIO_INCLUDE_DIRS} )
 
 fips_add_subdirectory("lib/")
 
