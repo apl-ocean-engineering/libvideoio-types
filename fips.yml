@@ -8,6 +8,7 @@ imports:
 exports:
   header-dirs:
     - include/
+    - third_party/
   modules:
     videoio: .
 

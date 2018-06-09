@@ -59,8 +59,8 @@ endif()
 
 ## Set global include paths
 set( VIDEOIO_INCLUDE_DIRS
-	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${CMAKE_CURRENT_SOURCE_DIR}/third_party
+	include
+	third_party
   ${OpenCV_INCLUDE_DIRS}
 	${TINYXML2_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR} )
