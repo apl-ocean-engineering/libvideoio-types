@@ -79,9 +79,5 @@ if( NOT FIPS_IMPORT )
 	  fips_add_subdirectory( test/unit/ )
 	endif()
 
-endif()
-
-
-if( NOT FIPS_IMPORT)
 	fips_finish()
 endif()
