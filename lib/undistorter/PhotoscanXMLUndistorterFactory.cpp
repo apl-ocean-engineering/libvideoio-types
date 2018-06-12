@@ -37,6 +37,7 @@ namespace libvideoio
   //
   // x = X / Z
   // y = Y / Z
+  // r = sqrt( x^2 + y^2 )
   //
   // x' = x(1 + K1r^2 + K2r^4 + K3r^6 + K4r^8 ) + (P1(r +2x ) + 2P2xy)(1 + P3r + P4r )
   // y' = y(1 + K1r^2 + K2r^4 + K3r^6 + K4r^8 ) + (P2(r +2y ) + 2P1xy)(1 + P3r + P4r )
@@ -49,14 +50,14 @@ namespace libvideoio
 
   // For reference, OpenCV does:
   //
-  // x = X / W
-  // y = Y / W
+  // x' = X / W
+  // y' = Y / W
   //
-  // x' = x'(1 + K1r^2 + K2r^4 + K3r^6 )/(1 + K4r^2 + K5r^4 + K6r^6) + 2p1x'y' + p2(r^2 + 2x'^2) + s1r^4 + s2r^4
-  // y' = y'(1 + K1r^2 + K2r^4 + K3r^6 )/(1 + K4r^2 + K5r^4 + K6r^6) + p1(r^2 + 2y'^2) + 2p2x'y' + s3r^2 + s4r^4
+  // x'' = x'(1 + K1r^2 + K2r^4 + K3r^6 )/(1 + K4r^2 + K5r^4 + K6r^6) + 2p1x'y' + p2(r^2 + 2x'^2) + s1r^4 + s2r^4
+  // y'' = y'(1 + K1r^2 + K2r^4 + K3r^6 )/(1 + K4r^2 + K5r^4 + K6r^6) + p1(r^2 + 2y'^2) + 2p2x'y' + s3r^2 + s4r^4
   //
-  // u = x'fx + c_x
-  // v = y'fy + c_y
+  // u = x''fx + c_x
+  // v = y''fy + c_y
 
 
   bool readDoubleFromXML( const XMLNode *parent, std::string name, double &value, double def = 0.0 )
@@ -106,7 +107,6 @@ namespace libvideoio
     valid = readIntFromXML(topNode, "width", width );
     valid = readIntFromXML(topNode, "height", height );
 
-
     double f=1.0, cx=0.0, cy=0.0;
 
     valid = readDoubleFromXML(topNode, "f", f);
@@ -123,12 +123,15 @@ namespace libvideoio
     originalK.at<double>(1, 1) = f;
     originalK.at<double>(2, 2) = 1;
 
-    originalK.at<double>(0, 0) = b2;
+    originalK.at<double>(0, 1) = b2;
 
     originalK.at<double>(0, 2) = cx + width/2.0;
     originalK.at<double>(1, 2) = cy + height/2.0;
 
-    cv::Mat distCoeffs( cv::Mat(1,4, CV_64F, cv::Scalar(0)) );
+    // OpenCV dist coeffs
+    //    (k1,k2,p1,p2[,k3[,k4,k5,k6[,s1,s2,s3,s4[,τx,τy]]]])
+
+    cv::Mat distCoeffs( cv::Mat(1,5, CV_64F, cv::Scalar(0)) );
     double val;
     if( readDoubleFromXML( topNode, "k1", val ) ) {
       distCoeffs.at<double>(0,0) = val;
@@ -136,6 +139,10 @@ namespace libvideoio
 
     if( readDoubleFromXML( topNode, "k2", val ) ) {
       distCoeffs.at<double>(0,1) = val;
+    }
+
+    if( readDoubleFromXML( topNode, "k3", val ) ) {
+      distCoeffs.at<double>(0,4) = val;
     }
 
     // Are the meaning of p1 and p2 really swapped rel to OpenCV?

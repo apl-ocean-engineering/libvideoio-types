@@ -24,7 +24,7 @@ namespace libvideoio
 
   _K = cv::getOptimalNewCameraMatrix(_originalK, _distCoeffs,
                 _inputSize(),
-                1,
+                0,              // 0 == all pixels in un-distorted image are valid
                 _outputSize(), nullptr, false);
 
   cv::initUndistortRectifyMap(_originalK, _distCoeffs, cv::Mat(), _K,
