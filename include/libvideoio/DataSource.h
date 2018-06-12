@@ -25,7 +25,7 @@ namespace libvideoio {
 class DataSource {
 public:
   DataSource( void )
-    : _fps( 0.0 )
+    : _fps( 0.0 ), _fmt(-1)
   {;}
 
   virtual ~DataSource()
@@ -51,12 +51,15 @@ public:
   float fps( void ) const { return _fps; }
   void setFPS( float f ) { _fps = f; }
 
+  void setOutputFormat( int fmt ) { _fmt = fmt; }
 
 protected:
 
   int _numImages;
   bool _hasDepth;
   float _fps;
+
+  int _fmt;
 
 };
 
