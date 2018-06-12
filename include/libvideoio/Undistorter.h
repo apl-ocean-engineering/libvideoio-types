@@ -130,7 +130,7 @@ public:
 	 * Creates and returns an Undistorter of the type used by the given
 	 * configuration file. If the format is not recognized, returns nullptr.
 	 */
-	static Undistorter* getUndistorterForFile(const std::string &configFilename);
+	static Undistorter* getUndistorterFromFile(const std::string &configFilename);
 
 };
 

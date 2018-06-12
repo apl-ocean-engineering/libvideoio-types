@@ -29,7 +29,7 @@ namespace libvideoio
 {
 
 
-Undistorter* UndistorterFactory::getUndistorterForFile(const std::string &configFileName)
+Undistorter* UndistorterFactory::getUndistorterFromFile(const std::string &configFileName)
 {
 	LOG(INFO) << "Attempting to determine type calibration from file ..." << configFileName;
 

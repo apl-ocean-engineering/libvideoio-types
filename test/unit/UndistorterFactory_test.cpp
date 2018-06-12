@@ -13,7 +13,7 @@ namespace {
 
 TEST( UndistorterFactory, LoadPTAMJSON ) {
 
-  std::shared_ptr<Undistorter> undistorter( UndistorterFactory::getUndistorterForFile( PTAM_JSON ) );
+  std::shared_ptr<Undistorter> undistorter( UndistorterFactory::getUndistorterFromFile( PTAM_JSON ) );
 
   ASSERT_TRUE( (bool)undistorter );
 
@@ -23,7 +23,7 @@ TEST( UndistorterFactory, LoadPTAMJSON ) {
 
 TEST( UndistorterFactory, LoadPhotoscanXML ) {
 
-  std::shared_ptr<Undistorter> undistorter( UndistorterFactory::getUndistorterForFile( PHOTOSCAN_XML ) );
+  std::shared_ptr<Undistorter> undistorter( UndistorterFactory::getUndistorterFromFile( PHOTOSCAN_XML ) );
   ASSERT_TRUE( (bool)undistorter );
 
   // cout << "Original K:" << endl << undistorter->getOriginalK() << endl;
