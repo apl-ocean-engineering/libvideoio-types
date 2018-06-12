@@ -12,7 +12,7 @@ namespace libvideoio
 
 // Legacy Undistorter from original LSD-SLAM
 
-UndistorterPTAM::UndistorterPTAM(const char* configFileName)
+PTAMUndistorter::PTAMUndistorter(const char* configFileName)
 {
 	valid = true;
 
@@ -268,7 +268,7 @@ UndistorterPTAM::UndistorterPTAM(const char* configFileName)
 	K_.at<double>(2, 1) = outputCalibration[3] * out_height - 0.5;
 }
 
-UndistorterPTAM::~UndistorterPTAM()
+PTAMUndistorter::~PTAMUndistorter()
 {
 
 	delete[] remapX;
@@ -276,7 +276,7 @@ UndistorterPTAM::~UndistorterPTAM()
 
 }
 
-void UndistorterPTAM::undistort(const cv::Mat& image, cv::OutputArray result) const
+void PTAMUndistorter::undistort(const cv::Mat& image, cv::OutputArray result) const
 {
 	if (!valid)
 	{
@@ -286,7 +286,7 @@ void UndistorterPTAM::undistort(const cv::Mat& image, cv::OutputArray result) co
 
 	if (image.rows != in_height || image.cols != in_width)
 	{
-		printf("UndistorterPTAM: input image size differs from expected input size! Not undistorting.\n");
+		printf("PTAMUndistorter: input image size differs from expected input size! Not undistorting.\n");
 		result.getMatRef() = image;
 		return;
 	}
@@ -334,42 +334,42 @@ void UndistorterPTAM::undistort(const cv::Mat& image, cv::OutputArray result) co
 	}
 }
 
-const Camera UndistorterPTAM::getCamera() const
+const Camera PTAMUndistorter::getCamera() const
 {
 	return Camera( K_ );
 }
 
-const cv::Mat UndistorterPTAM::getK() const
+const cv::Mat PTAMUndistorter::getK() const
 {
 	return K_;
 }
 
-const cv::Mat UndistorterPTAM::getOriginalK() const
+const cv::Mat PTAMUndistorter::getOriginalK() const
 {
 	return originalK_;
 }
 
-int UndistorterPTAM::getOutputWidth() const
+int PTAMUndistorter::getOutputWidth() const
 {
 	return out_width;
 }
 
-int UndistorterPTAM::getOutputHeight() const
+int PTAMUndistorter::getOutputHeight() const
 {
 	return out_height;
 }
-int UndistorterPTAM::getInputWidth() const
+int PTAMUndistorter::getInputWidth() const
 {
 	return in_width;
 }
 
-int UndistorterPTAM::getInputHeight() const
+int PTAMUndistorter::getInputHeight() const
 {
 	return in_height;
 }
 
 
-bool UndistorterPTAM::isValid() const
+bool PTAMUndistorter::isValid() const
 {
 	return valid;
 }

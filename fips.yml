@@ -1,8 +1,12 @@
 imports:
     fips-googletest:
         git: https://github.com/amarburg/fips-googletest.git
+    libg3logger:
+        git: https://github.com/amarburg/libg3logger.git
     liblogger:
         git: https://github.com/amarburg/liblogger.git
+    fips-CLI11:
+        git: https://github.com/amarburg/fips-CLI11.git
 
 exports:
   header-dirs:

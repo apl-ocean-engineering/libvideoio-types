@@ -283,7 +283,7 @@ namespace libvideoio
 
 
 	//
-	// UndistorterPTAM::~UndistorterPTAM()
+	// PTAMUndistorter::~PTAMUndistorter()
 	// {
 	//
 	// 	delete[] remapX;
@@ -291,7 +291,7 @@ namespace libvideoio
 	//
 	// }
 	//
-	// void UndistorterPTAM::undistort(const cv::Mat& image, cv::OutputArray result) const
+	// void PTAMUndistorter::undistort(const cv::Mat& image, cv::OutputArray result) const
 	// {
 	// 	if (!valid)
 	// 	{
@@ -301,7 +301,7 @@ namespace libvideoio
 	//
 	// 	if (image.rows != in_height || image.cols != in_width)
 	// 	{
-	// 		printf("UndistorterPTAM: input image size differs from expected input size! Not undistorting.\n");
+	// 		printf("PTAMUndistorter: input image size differs from expected input size! Not undistorting.\n");
 	// 		result.getMatRef() = image;
 	// 		return;
 	// 	}

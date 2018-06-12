@@ -158,7 +158,7 @@ public:
 
 
 
-class UndistorterPTAM : public Undistorter
+class PTAMUndistorter : public Undistorter
 {
 public:
 	/**
@@ -170,15 +170,15 @@ public:
 	 * crop / full / none
 	 * outputWidth outputHeight
 	 */
-	UndistorterPTAM(const char* configFileName);
+	PTAMUndistorter(const char* configFileName);
 
 	/**
 	 * Destructor.
 	 */
-	~UndistorterPTAM();
+	~PTAMUndistorter();
 
-	UndistorterPTAM(const UndistorterPTAM&) = delete;
-	UndistorterPTAM& operator=(const UndistorterPTAM&) = delete;
+	PTAMUndistorter(const PTAMUndistorter&) = delete;
+	PTAMUndistorter& operator=(const PTAMUndistorter&) = delete;
 
 	/**
 	 * Undistorts the given image and returns the result image.

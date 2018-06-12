@@ -19,7 +19,7 @@ TEST(PTAMUndistorterFactory, Load_d2_camera) {
   cout << "Processed K:" << endl << undistorter->getK() << endl;
 
   // Compare it to the original PTAM format
-  UndistorterPTAM legacy( PTAM_LEGACY );
+  PTAMUndistorter legacy( PTAM_LEGACY );
 
   cout << "Legacy K:" << endl << legacy.getOriginalK() << endl;
   cout << "Processed K:" << endl << legacy.getK() << endl;
