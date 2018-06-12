@@ -3,7 +3,6 @@ imports:
         git: https://github.com/amarburg/fips-googletest.git
     liblogger:
         git: https://github.com/amarburg/liblogger.git
-        branch: fips
 
 exports:
   header-dirs:
