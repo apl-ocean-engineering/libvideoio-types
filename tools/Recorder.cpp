@@ -15,7 +15,7 @@ namespace fs = boost::filesystem;
 
 #include "libvideoio/G3LogSinks.h"
 
-#include "libvideoio/DataSource.h"
+#include "libvideoio/ImageSource.h"
 #include "libvideoio/Undistorter.h"
 
 #include "logger/LogWriter.h"
@@ -105,7 +105,7 @@ int main( int argc, char** argv )
 		Display display( guiSwitch.getValue() );
 		ImageOutput imageOutput( imageOutputArg.getValue() );
 
-		DataSource *dataSource = NULL;
+		ImageSource *dataSource = NULL;
 
 
 		if( logInputArg.isSet() ) {

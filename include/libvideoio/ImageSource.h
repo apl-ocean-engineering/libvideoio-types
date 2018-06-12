@@ -22,17 +22,17 @@ namespace fs = boost::filesystem;
 namespace libvideoio {
 
 
-class DataSource {
+class ImageSource {
 public:
-  DataSource( void )
-    : _fps( 0.0 ), _fmt(-1)
+  ImageSource( void )
+    : _fps( 0.0 ), _outputType(-1)
   {;}
 
-  virtual ~DataSource()
+  virtual ~ImageSource()
   {;}
 
-  DataSource( const DataSource & ) = delete;
-  DataSource &operator=( const DataSource & ) = delete;
+  ImageSource( const ImageSource & ) = delete;
+  ImageSource &operator=( const ImageSource & ) = delete;
 
   bool hasDepth( void ) const { return _hasDepth; }
   int numImages( void ) const { return _numImages; }
@@ -43,15 +43,20 @@ public:
 
   virtual bool grab( void ) = 0;
 
-  virtual int getImage( int i, cv::Mat &mat ) = 0;
-  virtual int getImage( cv::Mat &mat ) { return getImage( 0, mat ); }
+  virtual int getRawImage( int i, cv::Mat &mat ) = 0;
+
+  virtual int getImage( int i, cv::Mat &mat );
+  virtual int getImage( cv::Mat &mat ) { return getImage(0, mat); };
 
   virtual void getDepth( cv::Mat &mat ) { return; }
 
   float fps( void ) const { return _fps; }
   void setFPS( float f ) { _fps = f; }
 
-  void setOutputFormat( int fmt ) { _fmt = fmt; }
+  void setOutputType( int type ) { _outputType = type; }
+
+  virtual int cvtToRGB() { return -1; }
+  virtual int cvtToGray() { return -1; }
 
 protected:
 
@@ -59,14 +64,14 @@ protected:
   bool _hasDepth;
   float _fps;
 
-  int _fmt;
+  int _outputType;
 
 };
 
 
-class ImagesSource : public DataSource {
+class ImageFilesSource : public ImageSource {
 public:
-  ImagesSource( const std::vector<std::string> &paths )
+  ImageFilesSource( const std::vector<std::string> &paths )
     : _idx( -1 )
   {
     for( std::string pathStr : paths ) {
@@ -82,7 +87,7 @@ public:
 
   }
 
-  ImagesSource( const std::vector<fs::path> &paths )
+  ImageFilesSource( const std::vector<fs::path> &paths )
     : _idx( -1 )
   {
     for( fs::path p : paths ) {
@@ -108,7 +113,7 @@ public:
     return true;
   }
 
-  virtual int getImage( int i, cv::Mat &mat )
+  virtual int getRawImage( int i, cv::Mat &mat )
   {
     if( i != 0 ) return 0;
 
@@ -130,7 +135,7 @@ protected:
 
 };
 
-class LoggerSource : public DataSource {
+class LoggerSource : public ImageSource {
 public:
   LoggerSource( const std::string &filename )
     : _reader( )
@@ -156,7 +161,7 @@ public:
     return _reader.grab();
   }
 
-  virtual int getImage( int i, cv::Mat &mat )
+  virtual int getRawImage( int i, cv::Mat &mat )
   {
     if( i < 0 || i >= _numImages )  return -1;
 
@@ -186,7 +191,7 @@ protected:
 
 };
 
-class VideoSource : public DataSource {
+class VideoSource : public ImageSource {
 public:
 
   VideoSource( const std::string &path )
@@ -233,7 +238,7 @@ public:
     return true;
   }
 
-  virtual int getImage( int i, cv::Mat &mat )
+  virtual int getRawImage( int i, cv::Mat &mat )
   {
     _capture.retrieve( mat, i );
     return 0;

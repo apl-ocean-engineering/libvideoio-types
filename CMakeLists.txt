@@ -28,7 +28,8 @@ endif()
 
 ## C++ flags applied to all builds
 ## squelch int-in-bool-context warnings from eigen
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-int-in-bool-context")
+##"-Wno-int-in-bool-context")
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 
 ## Configure OpenCV ##
 set( OPENCV_COMPONENTS core highgui imgproc video calib3d )
@@ -41,7 +42,6 @@ else()
   message( STATUS "Using OpenCV 2.x")
   add_definitions( -DOPENCV2 )
 endif()
-
 
 ## Need this workaround for CUDA 8.0
 #find_package( CUDA OPTIONAL 8.0 )
