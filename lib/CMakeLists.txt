@@ -8,7 +8,7 @@ fips_begin_module( videoio )
   fips_files( ${VIDEOIO_SOURCE_FILES} )
   fips_libs( ${Boost_LIBRARIES} ${OpenCV_LIBS}
              ${ZLIB_LIBRARIES} ${TINYXML2_LIBRARIES} )
-  fips_deps( logger )
+  fips_deps( g3logger )
 
   include_directories(
     ${VIDEOIO_INCLUDE_DIRS}

@@ -3,8 +3,8 @@ imports:
         git: https://github.com/amarburg/fips-googletest.git
     libbinlogger:
         git: https://github.com/amarburg/libbinlogger.git
-    liblogger:
-        git: https://github.com/amarburg/liblogger.git
+    libg3logger:
+        git: https://github.com/amarburg/libg3logger.git
     fips-CLI11:
         git: https://github.com/amarburg/fips-CLI11.git
 
@@ -13,7 +13,7 @@ exports:
     - include/
     - third_party/
   modules:
-    videoio: .
+    libvideoio: .
 
 defines:
   FIPS_EXCEPTIONS: ON
