@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <opencv2/core/core.hpp>
 
 #include "nlohmann/json.hpp"
@@ -244,6 +245,114 @@ private:
 	/// a valid configuration)
 	bool valid;
 };
+
+
+class ImageCropper : public Undistorter
+{
+public:
+	/**
+	 * Creates an Undistorter by reading the distortion parameters from a file.
+	 *
+	 * The file format is as follows:
+	 * d1 d2 d3 d4 d5
+	 * inputWidth inputHeight
+	 * crop / full / none
+	 * outputWidth outputHeight
+	 */
+	ImageCropper( int width, int height, int offsetX = 0, int offsetY = 0,
+								const std::shared_ptr<Undistorter> & wrap  = nullptr )
+								: _wrapped(wrap),
+								 _offsetX(offsetX), _offsetY(offsetY),
+								 _width(width),      _height(height)
+								{;}
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~ImageCropper()
+	{;}
+
+	ImageCropper(const ImageCropper&) = delete;
+	ImageCropper& operator=(const ImageCropper&) = delete;
+
+	/**
+	 * Undistorts the given image and returns the result image.
+	 */
+	void undistort(const cv::Mat &image, cv::OutputArray result) const
+	{
+
+		if( _wrapped ) {
+			cv::Mat intermediate;
+			_wrapped->undistort( image, intermediate );
+			result.setTo( cv::Mat( intermediate, cv::Rect( _offsetX, _offsetY, _width, _height )) );
+		} else {
+			result.setTo( cv::Mat( image, cv::Rect( _offsetX, _offsetY, _width, _height )) );
+		}
+	}
+
+	/**
+	 * Returns the intrinsic parameter matrix of the undistorted images.
+	 */
+	//const cv::Mat getK() const;
+
+	virtual const cv::Mat getK() const {
+		if( _wrapped ) return _wrapped->getK();
+
+		return cv::Mat::eye(3,3, CV_32F );
+	}
+
+
+	/**
+	 * Returns the intrinsic parameter matrix of the original images,
+	 */
+	const cv::Mat getOriginalK() const { return getK(); }
+
+	/**
+	 * Returns the width of the output images in pixels.
+	 */
+	int getOutputWidth() const { return _width; }
+
+	/**
+	 * Returns the height of the ouptut images in pixels.
+	 */
+	int getOutputHeight() const { return _height; }
+
+
+	virtual ImageSize inputImageSize( void ) const
+		{ return ImageSize( getInputWidth(), getInputHeight() ); }
+
+	/**
+	 * Returns the width of the input images in pixels.
+	 */
+	int getInputWidth() const {
+		if( _wrapped ) return _wrapped->getInputWidth();
+
+		return _width;
+	}
+
+	/**
+	 * Returns the height of the input images in pixels.
+	 */
+	int getInputHeight() const {
+		if( _wrapped ) return _wrapped->getInputHeight();
+		return _width;
+	}
+
+
+	/**
+	 * Returns if the undistorter was initialized successfully.
+	 */
+	bool isValid() const { return true; }
+
+private:
+
+	std::shared_ptr<Undistorter> _wrapped;
+
+	int _offsetX, _offsetY;
+	int _width, _height;
+
+};
+
 
 
 // class UndistorterOpenCV : public Undistorter
