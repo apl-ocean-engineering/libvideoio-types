@@ -280,14 +280,13 @@ public:
 	 */
 	void undistort(const cv::Mat &image, cv::OutputArray result) const
 	{
-
+		cv::Mat intermediate(image);
 		if( _wrapped ) {
-			cv::Mat intermediate;
 			_wrapped->undistort( image, intermediate );
-			result.setTo( cv::Mat( intermediate, cv::Rect( _offsetX, _offsetY, _width, _height )) );
-		} else {
-			result.setTo( cv::Mat( image, cv::Rect( _offsetX, _offsetY, _width, _height )) );
 		}
+
+		cv::Mat roi( intermediate, cv::Rect( _offsetX, _offsetY, _width, _height ) );
+		result.assign( roi );
 	}
 
 	/**
@@ -307,19 +306,12 @@ public:
 	 */
 	const cv::Mat getOriginalK() const { return getK(); }
 
-	/**
-	 * Returns the width of the output images in pixels.
-	 */
-	int getOutputWidth() const { return _width; }
-
-	/**
-	 * Returns the height of the ouptut images in pixels.
-	 */
-	int getOutputHeight() const { return _height; }
-
+	virtual ImageSize outputImageSize( void ) const
+	{ return ImageSize( _width, _height ); };
 
 	virtual ImageSize inputImageSize( void ) const
-		{ return ImageSize( getInputWidth(), getInputHeight() ); }
+		{ if( _wrapped ) return _wrapped->outputImageSize();
+			return ImageSize( _width, _height ); }
 
 	/**
 	 * Returns the width of the input images in pixels.
