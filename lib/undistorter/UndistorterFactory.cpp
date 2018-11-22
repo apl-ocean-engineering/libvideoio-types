@@ -29,7 +29,7 @@ namespace libvideoio
 {
 
 
-Undistorter* UndistorterFactory::getUndistorterFromFile(const std::string &configFileName)
+Undistorter* UndistorterFactory::getUndistorterFromFile(const std::string &configFileName, const std::shared_ptr<Undistorter> & wrap )
 {
 	LOG(INFO) << "Attempting to determine type calibration from file ..." << configFileName;
 
@@ -42,7 +42,7 @@ Undistorter* UndistorterFactory::getUndistorterFromFile(const std::string &confi
 
 		if( j.count("calib_type") > 0 ) {
 			LOG(INFO) << "   ... believe file is PTAM JSON format";
-			return PTAMUndistorterFactory::loadFromJSON(j);
+			return PTAMUndistorterFactory::loadFromJSON(j, wrap );
 		}
 	} catch( nlohmann::json::parse_error e ) {
 		LOG(INFO) << "Error parsing JSON: " << e.what();
@@ -54,7 +54,7 @@ Undistorter* UndistorterFactory::getUndistorterFromFile(const std::string &confi
 
 	if( topNode ) {
 		LOG(INFO) << "   ... believe file is Photoscan XML format";
-		return PhotoscanXMLUndistorterFactory::loadFromXML( doc, configFileName );
+		return PhotoscanXMLUndistorterFactory::loadFromXML( doc, configFileName, wrap );
 	}
 
 

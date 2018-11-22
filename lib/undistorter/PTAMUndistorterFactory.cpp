@@ -27,7 +27,7 @@ namespace libvideoio
 	//		"outputSize": []
 	// }
 
-	OpenCVUndistorter *PTAMUndistorterFactory::loadFromFile(const std::string &configFileName)
+	OpenCVUndistorter *PTAMUndistorterFactory::loadFromFile(const std::string &configFileName, const std::shared_ptr<Undistorter> & wrap )
 	{
 		std::ifstream inFile(configFileName);
 
@@ -43,10 +43,10 @@ namespace libvideoio
 			return nullptr;
 		}
 
-		return loadFromJSON( j );
+		return loadFromJSON( j, wrap );
 	}
 
-	OpenCVUndistorter *PTAMUndistorterFactory::loadFromJSON(const nlohmann::json &json )
+	OpenCVUndistorter *PTAMUndistorterFactory::loadFromJSON(const nlohmann::json &json, const std::shared_ptr<Undistorter> & wrap )
 	{
 		// Basic validation
 		if( json.count("calib_type") == 0 ) return nullptr;
@@ -277,7 +277,7 @@ namespace libvideoio
 		K_.at<double>(2, 1) = outputCalibration[3] * out_height - 0.5;
 
 		cv::Mat distCoeff = (cv::Mat_<double>(1,4) << 0, 0, 0, 0);
-		return new OpenCVUndistorter( K_, distCoeff, ImageSize( inSize[0], inSize[1] ));
+		return new OpenCVUndistorter( K_, distCoeff, ImageSize( inSize[0], inSize[1] ), wrap );
 	}
 
 

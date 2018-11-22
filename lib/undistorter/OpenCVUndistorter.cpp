@@ -13,9 +13,11 @@ namespace libvideoio
 {
 
   OpenCVUndistorter::OpenCVUndistorter( const cv::Mat &k,
-											const cv::Mat &distCoeff,
-											const ImageSize &origSize )
-    : _originalK( k ),
+					const cv::Mat &distCoeff,
+					const ImageSize &origSize,
+                      const std::shared_ptr<Undistorter> & wrap )
+    : Undistorter(wrap),
+      _originalK( k ),
       _distCoeffs( distCoeff ),
       _inputSize( origSize ),
       _outputSize( origSize ),
@@ -43,7 +45,12 @@ OpenCVUndistorter::~OpenCVUndistorter()
 
 void OpenCVUndistorter::undistort(const cv::Mat& image, cv::OutputArray result) const
 {
-	 cv::remap(image, result, _map1, _map2, cv::INTER_LINEAR);
+  cv::Mat intermediate(image);
+  if( _wrapped ) {
+    _wrapped->undistort( image, intermediate );
+  }
+
+	 cv::remap(intermediate, result, _map1, _map2, cv::INTER_LINEAR);
 }
 
 

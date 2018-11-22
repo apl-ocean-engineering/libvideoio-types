@@ -84,15 +84,15 @@ namespace libvideoio
     return false;
   }
 
-  OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromFile(const std::string &configFileName)
+  OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromFile(const std::string &configFileName, const std::shared_ptr<Undistorter> & wrap )
   {
     XMLDocument doc;
     doc.LoadFile( configFileName.c_str() );
 
-    return loadFromXML( doc, configFileName );
+    return loadFromXML( doc, configFileName, wrap );
   }
 
-  OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromXML( XMLDocument &doc, const std::string &configFileName )
+  OpenCVUndistorter *PhotoscanXMLUndistorterFactory::loadFromXML( XMLDocument &doc, const std::string &configFileName, const std::shared_ptr<Undistorter> & wrap )
   {
     bool valid = true;
     auto topNode = doc.FirstChildElement( "calibration" );
@@ -155,7 +155,7 @@ namespace libvideoio
     }
 
     if (valid) {
-      return new OpenCVUndistorter( originalK, distCoeffs, ImageSize(width,height) );
+      return new OpenCVUndistorter( originalK, distCoeffs, ImageSize(width,height), wrap );
     }
 
     // Else fail

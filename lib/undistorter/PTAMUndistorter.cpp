@@ -12,7 +12,8 @@ namespace libvideoio
 
 // Legacy Undistorter from original LSD-SLAM
 
-PTAMUndistorter::PTAMUndistorter(const char* configFileName)
+PTAMUndistorter::PTAMUndistorter(const char* configFileName, const std::shared_ptr<Undistorter> & wrap )
+	: Undistorter(wrap)
 {
 	valid = true;
 
@@ -297,6 +298,8 @@ void PTAMUndistorter::undistort(const cv::Mat& image, cv::OutputArray result) co
 		result.getMatRef() = image;
 		return;
 	}
+
+	// TODO,   Handle _wrapped
 
 	result.create(out_height, out_width, CV_8U);
 	cv::Mat resultMat = result.getMatRef();
