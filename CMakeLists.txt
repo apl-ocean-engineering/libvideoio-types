@@ -68,11 +68,20 @@ fips_include_directories( ${VIDEOIO_INCLUDE_DIRS} )
 
 fips_add_subdirectory("lib/")
 
+
+## Provide option to not build tools, default to yes unless FIP_IMPORT
+option( LIBVIDEOIO_BUILD_TOOLS ON )
+if( NOT FIPS_IMPORT )
+  set( LIBVIDEOIO_BUILD_TOOLS OFF )
+endif()
+if( LIBVIDEOIO_BUILD_TOOLS )
+  fips_add_subdirectory( tools/ )
+endif()
+
+
 if( NOT FIPS_IMPORT )
 	set( TEST_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/data" )
 	add_definitions( -DTEST_DATA_DIR="${TEST_DATA_DIR}" )
-
-	fips_add_subdirectory("tools/")
 
 	if( FIPS_UNITTESTS )
 		message("** Will run unit tests")
