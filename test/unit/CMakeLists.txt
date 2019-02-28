@@ -1,6 +1,6 @@
 include_directories( ${CMAKE_SOURCE_DIR}/lib )
 
-file( GLOB UNIT_TEST_SRCS *_test.cpp )
+file( GLOB UNIT_TEST_SRCS *_test.cpp test_*.cpp )
 
 gtest_begin(videoio NO_TEMPLATE)
     fips_files(

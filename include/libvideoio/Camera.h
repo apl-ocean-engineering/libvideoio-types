@@ -8,6 +8,7 @@
 namespace libvideoio {
 
 struct Camera {
+
   Camera( void )
     : fx(1), fy(1), cx(0), cy(0)
   {
