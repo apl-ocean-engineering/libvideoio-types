@@ -33,6 +33,16 @@ struct Camera {
     buildK();
   }
 
+  // Copy constructor
+  Camera( const Camera &other )
+    : fx( other.fx ),
+      fy( other.fy ),
+      cx( other.cx ),
+      cy( other.cy )
+  {
+    buildK();
+  }
+
   Camera scale( float scale ) const
   {
     return Camera( fx*scale, fy*scale,
