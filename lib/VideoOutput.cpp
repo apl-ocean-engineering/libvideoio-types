@@ -29,7 +29,7 @@ namespace libvideoio {
 
 			const char *fcc = _fourcc.c_str();
 
-			_writer.reset( new cv::VideoWriter(_file.string(), CV_FOURCC(fcc[0], fcc[1], fcc[2], fcc[3]), _fps, cv::Size(img.cols, img.rows)));
+			_writer.reset( new cv::VideoWriter(_file.string(), cv::VideoWriter::fourcc(fcc[0], fcc[1], fcc[2], fcc[3]), _fps, cv::Size(img.cols, img.rows)));
 
 			LOG_IF( FATAL, _writer->isOpened() == false) << "Unable to open video writer.";
 		}

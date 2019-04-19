@@ -21,6 +21,7 @@ namespace fs = boost::filesystem;
 
 namespace libvideoio {
 
+using namespace cv;
 
 class ImageSource {
 public:
@@ -119,7 +120,7 @@ public:
 
     if( _idx >= (int)_paths.size() ) return -1;
 
-    mat = cv::imread( _paths[_idx].string(), CV_LOAD_IMAGE_GRAYSCALE );
+    mat = cv::imread( _paths[_idx].string(), cv::IMREAD_GRAYSCALE );
     return _idx;
   }
 
@@ -201,7 +202,7 @@ public:
        _hasDepth = false;
        _numImages = 1;
 
-       setFPS(  _capture.get(CV_CAP_PROP_FPS) );
+       setFPS(  _capture.get(cv::CAP_PROP_FPS) );
   }
 
   ~VideoSource()
@@ -212,19 +213,19 @@ public:
 
   void skipTo( int frame )
   {
-    _capture.set( CV_CAP_PROP_POS_FRAMES, frame );
+    _capture.set( cv::CAP_PROP_POS_FRAMES, frame );
   }
 
   virtual int numFrames( void ) const
   {
     cv::VideoCapture &vc( const_cast< cv::VideoCapture &>(_capture) );
-    return vc.get(CV_CAP_PROP_FRAME_COUNT);
+    return vc.get(cv::CAP_PROP_FRAME_COUNT);
   }
 
   virtual int frameNum( void ) const
   {
     cv::VideoCapture &vc( const_cast< cv::VideoCapture &>(_capture) );
-    return vc.get(CV_CAP_PROP_POS_FRAMES);
+    return vc.get(cv::CAP_PROP_POS_FRAMES);
   }
 
   virtual bool grab( void )
@@ -252,8 +253,8 @@ public:
   cv::Size cvSize( void ) const
   {
     cv::VideoCapture &vc( const_cast< cv::VideoCapture &>(_capture) );
-    return cv::Size( vc.get(CV_CAP_PROP_FRAME_WIDTH),
-     								 vc.get(CV_CAP_PROP_FRAME_HEIGHT) );
+    return cv::Size( vc.get(cv::CAP_PROP_FRAME_WIDTH),
+     								 vc.get(cv::CAP_PROP_FRAME_HEIGHT) );
   }
 
   bool isOpened() const
