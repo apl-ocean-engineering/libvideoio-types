@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "libvideoio/Camera.h"
+#include "libvideoio/types/Camera.h"
 
 using namespace libvideoio;
 using namespace std;
