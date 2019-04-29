@@ -6,8 +6,6 @@ imports:
 exports:
   header-dirs:
     - include/
-  modules:
-    libvideoio_types: .
 
 defines:
   FIPS_EXCEPTIONS: ON
