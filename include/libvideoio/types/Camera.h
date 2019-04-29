@@ -18,8 +18,8 @@ struct Camera {
   Camera( const cv::Mat &kin )
     : fx( kin.at<double>(0, 0) ),
       fy( kin.at<double>(1, 1) ),
-      cx( kin.at<double>(2, 0) ),
-      cy( kin.at<double>(2, 1) )
+      cx( kin.at<double>(0, 2) ),
+      cy( kin.at<double>(1, 2) )
   {
     buildK();
   }
